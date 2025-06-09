@@ -16,6 +16,7 @@ const GQIDashboard = () => {
         <Grid item xs={12}>
           <Typography>GQI Dashboard</Typography>
           <Button variant="outlined" onClick={consoleFunction}>TEST</Button>
+          <Button variant="outlined" onClick={consoleFunction}>TEST</Button>
         </Grid>
         <Grid item xs={12}>
           <Divider />
