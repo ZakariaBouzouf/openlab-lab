@@ -434,18 +434,45 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
     }));
   };
 
+  // Get selected column
+  const selectedColumn = state.axisOptions.xAxisOptions.find(
+    (col) => col.field === state.axisOptions.selectedXAxis
+  );
+
+  const selectedYColumn = state.axisOptions.yAxisOptions.find(
+    (col) => col.field === state.axisOptions.selectedYAxis
+  );
+
+  const selectedZColumn = state.axisOptions.barValueOptions.find(
+    (col) => col.field === state.axisOptions.selectedBarValue
+  );
+
+  // Determine the label to show based on the column type
+  // If column type is "string", label is "Categorical", otherwise "Numerical"
+  const typeLabel = selectedColumn
+    ? (selectedColumn.type === "string" ? "Categorical" : "Numerical")
+    : "Unknown"; // optional fallback if no column is selected
+
+  const typeYLabel = selectedYColumn
+    ? (selectedYColumn.type === "string" ? "Categorical" : "Numerical")
+    : "Unknown"; // optional fallback if no column is selected
+    
+  const typeZLabel = selectedZColumn
+    ? (selectedZColumn.type === "string" ? "Categorical" : "Numerical")
+    : "Unknown"; // optional fallback if no column is selected
+
   return (
     <>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="x-axis-select-label">X-Axis: Group By</InputLabel>
+            <InputLabel id="x-axis-select-label">X-Axis: Group By ({typeLabel})</InputLabel>
             <Select
               labelId="x-axis-select-label"
               id="x-axis-select"
               value={state.axisOptions.selectedXAxis}
               onChange={handleXAxisChange}
-              label="X-Axis: Group By"
+              label="X-Axis: Group By-Column-Type"
               variant="outlined"
             >
               {state.axisOptions.xAxisOptions.map((col) => (
@@ -458,13 +485,13 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="bar-value-select-label">Stack Label</InputLabel>
+            <InputLabel id="bar-value-select-label">Stack Label ({typeZLabel})</InputLabel>
             <Select
               labelId="bar-value-select-label"
               id="bar-value-select"
               value={state.axisOptions.selectedBarValue}
               onChange={handleBarValueChange}
-              label="Stack Label"
+              label="Stack Label-Column-Type"
               variant="outlined"
             >
               {state.axisOptions.barValueOptions.map((col) => (
@@ -477,13 +504,13 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="y-axis-select-label">Y-Axis</InputLabel>
+            <InputLabel id="y-axis-select-label">Y-Axis ({typeYLabel})</InputLabel>
             <Select
               labelId="y-axis-select-label"
               id="y-axis-select"
               value={state.axisOptions.selectedYAxis}
               onChange={handleYAxisChange}
-              label="Y-Axis"
+              label="Y-Axis-Column-Type"
               variant="outlined"
             >
               {state.axisOptions.yAxisOptions.map((col) => (

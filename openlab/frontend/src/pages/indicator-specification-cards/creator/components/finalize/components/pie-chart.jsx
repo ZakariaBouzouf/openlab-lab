@@ -331,18 +331,37 @@ const PieChart = ({ customize = false, handleToggleCustomizePanel }) => {
     }));
   };
 
+  // Get selected column
+  const selectedColumn = state.axisOptions.xAxisOptions.find(
+    (col) => col.field === state.axisOptions.selectedXAxis
+  );
+
+  const selectedYColumn = state.axisOptions.yAxisOptions.find(
+    (col) => col.field === state.axisOptions.selectedYAxis
+  );
+
+  // Determine the label to show based on the column type
+  // If column type is "string", label is "Categorical", otherwise "Numerical"
+  const typeLabel = selectedColumn
+    ? (selectedColumn.type === "string" ? "Categorical" : "Numerical")
+    : "Unknown"; // optional fallback if no column is selected
+
+  const typeYLabel = selectedYColumn
+    ? (selectedYColumn.type === "string" ? "Categorical" : "Numerical")
+    : "Unknown"; // optional fallback if no column is selected
+
   return (
     <>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth>
-            <InputLabel id="x-axis-select-label">Categories</InputLabel>
+            <InputLabel id="x-axis-select-label">Categories ({typeLabel})</InputLabel>
             <Select
               labelId="x-axis-select-label"
               id="x-axis-select"
               value={state.axisOptions.selectedXAxis}
               onChange={handleXAxisChange}
-              label="Categories"
+              label="Categories-Column-Type"
               variant="outlined"
             >
               {state.axisOptions.xAxisOptions.map((col) => (
@@ -355,13 +374,13 @@ const PieChart = ({ customize = false, handleToggleCustomizePanel }) => {
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth>
-            <InputLabel id="y-axis-select-label">Values</InputLabel>
+            <InputLabel id="y-axis-select-label">Values ({typeYLabel})</InputLabel>
             <Select
               labelId="y-axis-select-label"
               id="y-axis-select"
               value={state.axisOptions.selectedYAxis}
               onChange={handleYAxisChange}
-              label="Values"
+              label="Values-Column-Type"
               variant="outlined"
             >
               {state.axisOptions.yAxisOptions.map((col) => (

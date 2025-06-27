@@ -147,6 +147,20 @@ const DataTableManager = () => {
     state.page * state.pageSize,
   );
 
+  const modifiedColumns = dataset.columns.map((col) => {
+    // Remove existing suffix if present (to avoid duplicate suffix on re-render)
+    const baseName = col.headerName.replace(/\s\((Categorical|Numerical)\)$/, "");
+
+    // Determine suffix based on column type
+    const suffix = col.type === "string" ? "Categorical" : "Numerical";
+    
+    // Return new column object with updated header name
+    return {
+    ...col,
+    headerName: `${baseName} (${suffix})`,
+    };
+  });
+
   return (
     <>
       <Grid container spacing={2}>
@@ -155,7 +169,7 @@ const DataTableManager = () => {
         </Grid>
         <Grid item xs={12}>
           <DataGrid
-            columns={dataset.columns}
+            columns={modifiedColumns}
             rows={paginatedRows}
             apiRef={apiRef}
             columnMenuClearIcon={<ClearAllIcon />}
