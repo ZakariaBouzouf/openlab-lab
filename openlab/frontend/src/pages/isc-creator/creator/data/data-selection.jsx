@@ -85,7 +85,7 @@ export default function DataSelection({
     //     "An 'ordinal' categorical variable has a clear ordering. For example, temperature as a variable with three orderly categories (low, medium and high)",
     // },
   ];
-
+  
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -1322,8 +1322,8 @@ export default function DataSelection({
 }
 
 const CSVUploader = ({ handlePopulateDataAndCloseModal }) => {
+  
   const [file, setFile] = useState({ name: "" });
-
   const handleUploadFile = () => {
     const reader = new FileReader();
     reader.onload = async ({ target }) => {
@@ -1491,6 +1491,7 @@ const CSVUploader = ({ handlePopulateDataAndCloseModal }) => {
             </Link>
           </Grid>
         )}
+ 
       </Box>
       <Grid container justifyContent="center" sx={{ pt: 2 }}>
         <Button
