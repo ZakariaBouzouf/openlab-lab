@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Accordion,
   AccordionActions,
@@ -22,8 +22,14 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import DoneIcon from "@mui/icons-material/Done";
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
 
 const SpecifyRequirements = () => {
+  const [open, setOpen] = useState(false);
+  const [permissionToChange, setPermissionToChange] = useState(false);
   const {
     requirements,
     setRequirements,
@@ -35,6 +41,14 @@ const SpecifyRequirements = () => {
   const [state, setState] = useState({
     showSelections: true,
   });
+
+  useEffect(()=>{
+    if(permissionToChange){
+      addNewColumnsMethod();
+      setPermissionToChange(false);
+    }
+  },[permissionToChange])
+
 
   const handleTogglePanel = () => {
     setLockedStep((prevState) => ({
@@ -61,10 +75,33 @@ const SpecifyRequirements = () => {
     }));
   };
 
+  const handleConfirmChange = () => {
+    setPermissionToChange(true);
+    handleClose();
+    handleTogglePanel()
+  }
+
+ const handleDeclineChange = () => {
+   handleClose();
+   handleTogglePanel()
+ }
+   
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  console.log("Dataset",dataset)
+  console.log("Requirement",requirements)
   const handleUnlockPath = () => {
-    handleTogglePanel();
     if (lockedStep.path.locked) {
       addNewColumnsMethod();
+      handleTogglePanel();
+    }else{
+      handleClickOpen()
     }
     setLockedStep((prevState) => ({
       ...prevState,
@@ -75,6 +112,7 @@ const SpecifyRequirements = () => {
       },
     }));
   };
+
 
   const addNewColumnsMethod = () => {
     let tempColumnData = [];
@@ -508,6 +546,22 @@ const SpecifyRequirements = () => {
               </Grid>
             </Grid>
           </Grid>
+          <Dialog
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">Do you want to update the changes in the following steps</DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleDeclineChange}>Disagree</Button>
+              <Button onClick={handleConfirmChange} autoFocus>
+                Agree
+              </Button>
+            </DialogActions>
+          </Dialog>
         </AccordionActions>
       </Accordion>
     </>
