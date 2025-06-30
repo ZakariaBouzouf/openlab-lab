@@ -5,6 +5,7 @@ import SpecifyRequirements from "./components/specify-requirements/specify-requi
 import ChoosePath from "./components/choose-path/choose-path.jsx";
 import Visualization from "./components/visualization/visualization.jsx";
 import Dataset from "./components/dataset/dataset.jsx";
+import Dataset2 from "./components/dataset/dataset2.jsx";
 import Finalize from "./components/finalize/finalize.jsx";
 import { useSnackbar } from "notistack";
 
@@ -41,6 +42,7 @@ const IndicatorSpecificationCard = () => {
             { value: "", placeholder: "e.g., number of downloads", type: {} },
           ],
           selectedPath: "",
+          selectedMethod: "",
           edit: {
             goal: true,
             question: true,
@@ -126,6 +128,15 @@ const IndicatorSpecificationCard = () => {
             openPanel: false,
             step: "5",
           },
+          method:{locked: true,type:""},
+          manual:{
+            locked:true,
+            openPanel: false,
+          },
+          upload:{
+            locked:true,
+            openPanel: false,
+          },
         };
   });
 
@@ -208,12 +219,12 @@ const IndicatorSpecificationCard = () => {
           )}
           {lockedStep.dataset.step === "4" && (
             <Grid size={{ xs: 12 }}>
-              <Dataset />
+              <Dataset2/>
             </Grid>
           )}
           {lockedStep.dataset.step === "3" && (
             <Grid size={{ xs: 12 }}>
-              <Dataset />
+              <Dataset2 />
             </Grid>
           )}
           {lockedStep.visualization.step === "4" && (
