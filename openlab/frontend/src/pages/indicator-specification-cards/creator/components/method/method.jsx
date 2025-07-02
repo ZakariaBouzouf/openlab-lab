@@ -2,13 +2,11 @@ import React, { useContext, useState } from "react";
 import {
   Accordion,
   AccordionActions,
-  AccordionDetails,
   AccordionSummary,
   Button,
   Chip,
   Grow,
   IconButton,
-  Paper,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -20,112 +18,22 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import DataTableManager from "./data-table-manager/data-table-manager.jsx";
-import UploadCSV from "./upload-csv/uploadCSV.jsx";
+import DataTableManager from "../dataset/data-table-manager/data-table-manager.jsx";
+import UploadCSV from "../dataset/upload-csv/uploadCSV.jsx";
 
-const Dataset2 = () => {
-  const { requirements, setRequirements, lockedStep, setLockedStep,dataset } =
+const Method = () =>{
+  const { requirements, lockedStep, setLockedStep,dataset } =
     useContext(ISCContext);
   const [state, setState] = useState({
     showSelections: true,
   });
 
-  console.log("lockedStep ",lockedStep)
-  console.log("dataset ",dataset)
-
-  const handleChooseManualPath = () => {
-    let vis = "Manual";
-    // handleTogglePanel();
-    if (requirements.selectedMethod !== vis) {
-      setLockedStep((prevState) => ({
-        ...prevState,
-        manual: {
-          ...prevState.manual,
-          locked: false,
-          openPanel: true,
-        },
-        upload: {
-          ...prevState.upload,
-          locked: true,
-          openedPanel: false,
-        },
-        method:{
-          ...prevState.method,
-          type: vis,
-        }
-      }));
-      setRequirements((prevState) => ({
-        ...prevState,
-        selectedMethod: vis,
-      }));
-    } else {
-      setLockedStep((prevState) => ({
-        ...prevState,
-        manual: {
-          ...prevState.manual,
-          openedPanel: true,
-        },
-      }));
-    }
-  };
-
-  const handleChooseUploadPath = () => {
-    let vis = "Upload";
-    // handleTogglePanel();
-    if (requirements.selectedMethod !== vis) {
-      setLockedStep((prevState) => ({
-        ...prevState,
-        manual: {
-          ...prevState.manual,
-          locked: true,
-          openPanel: false,
-        },
-        upload: {
-          ...prevState.upload,
-          locked: false,
-          openedPanel: true,
-        },
-          method:{
-          ...prevState.method,
-          type: vis,
-        }
-      }));
-      setRequirements((prevState) => ({
-        ...prevState,
-        selectedMethod: vis,
-      }));
-    } else {
-      setLockedStep((prevState) => ({
-        ...prevState,
-        upload: {
-          ...prevState.upload,
-          openedPanel: true,
-        },
-      }));
-    }
-  }
-
-  const handleReturnToMethods = () =>{
+  const handleTogglePanel = () => {
     setLockedStep((prevState) => ({
       ...prevState,
       method: {
         ...prevState.method,
-        type:"",
-      },
-    }));
-    setRequirements((prevState) => ({
-      ...prevState,
-      selectedMethod: "",
-    }));
-  }
-
-  const handleTogglePanel = () => {
-    setLockedStep((prevState) => ({
-      ...prevState,
-      dataset: {
-        ...prevState.dataset,
-        openPanel: !prevState.dataset.openPanel,
+        openPanel: !prevState.method.openPanel,
       },
     }));
   };
@@ -145,7 +53,7 @@ const Dataset2 = () => {
         ...prevState.visualization,
         locked: false,
         openPanel: true,
-        step: "4",
+        step: "5",
       },
     }));
   };
@@ -162,31 +70,11 @@ const Dataset2 = () => {
     }));
   };
 
-
-  const buttonStyle = (type = "visualization") => {
-    return {
-      height: 150,
-      width: 150,
-      border: "3px solid",
-      borderColor: type === "dataset" ? blue[200] : orange[200],
-      "&:hover": {
-        boxShadow: 5,
-        borderColor: type === "dataset" ? blue[900] : orange[800],
-      },
-      p: 2,
-      borderRadius: 2,
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      cursor: "pointer",
-    };
-  };
-
   return (
     <>
       <Accordion
-        expanded={lockedStep.dataset.openPanel}
-        disabled={lockedStep.dataset.locked}
+        expanded={lockedStep.method.openPanel}
+        disabled={lockedStep.method.locked}
       >
         <AccordionSummary>
           <Grid container spacing={1}>
@@ -200,8 +88,8 @@ const Dataset2 = () => {
                 <Grid item xs>
                   <Grid container alignItems="center" spacing={1}>
                     <Grid item>
-                      {!lockedStep.dataset.locked ? (
-                        <Chip label={lockedStep.dataset.step} color="primary" />
+                      {!lockedStep.method.locked ? (
+                        <Chip label={lockedStep.method.step} color="primary" />
                       ) : (
                         <IconButton size="small">
                           <LockIcon />
@@ -209,9 +97,10 @@ const Dataset2 = () => {
                       )}
                     </Grid>
                     <Grid item>
-                      <Typography>Dataset</Typography>
+                      <Typography>Method</Typography>
                     </Grid>
-                    {!lockedStep.dataset.openPanel && (
+
+                    {!lockedStep.method.openPanel && (
                       <>
                         <Grid item>
                           <Tooltip title="Edit method">
@@ -242,7 +131,7 @@ const Dataset2 = () => {
                     )}
                   </Grid>
                 </Grid>
-                {lockedStep.dataset.openPanel && (
+                {lockedStep.method.openPanel && (
                   <Grid item>
                     <Tooltip title="Close panel">
                       <IconButton onClick={handleTogglePanel}>
@@ -254,21 +143,13 @@ const Dataset2 = () => {
               </Grid>
             </Grid>
             <Grow
-              in={!lockedStep.dataset.openPanel && state.showSelections}
+              in={!lockedStep.method.openPanel && state.showSelections}
               timeout={{ enter: 500, exit: 0 }}
               unmountOnExit
             >
               <Grid item xs={12}>
                 {requirements.selectedPath !== "" && (
                   <Grid item xs={12} spacing={4}>
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item>
-                        <Typography>Selected path:</Typography>
-                      </Grid>
-                      <Grid item>
-                        <Chip label={requirements.selectedPath} />
-                      </Grid>
-                    </Grid>
                     {requirements.selectedMethod !== "" &&(
                       <Grid container alignItems="center" spacing={1}>
                         <Grid item>
@@ -287,42 +168,6 @@ const Dataset2 = () => {
         </AccordionSummary>
 
         <Grid item spacing={2} sx={{ pl: 1 }}>
-          {lockedStep.method.type !== "" &&(
-            <IconButton aria-label="return" sx={{mb:2}} color="primary" onClick={handleReturnToMethods}> 
-              <ArrowBackIosIcon /> 
-              {/* TODO: change this */}
-              {/* Return to methods */}
-            </IconButton>
-          )}
-
-          {lockedStep.method.type == "" && (<AccordionDetails>
-            <Grid container justifyContent="center" spacing={4} sx={{ py: 2 }}>
-              <Grid item>
-                <Paper
-                  elevation={0}
-                  sx={buttonStyle()}
-                  onClick={handleChooseManualPath}
-                >
-                  <Typography variant="h6" align="center">
-                    Manually
-                  </Typography>
-                </Paper>
-              </Grid>
-
-              <Grid item>
-                <Paper
-                  elevation={0}
-                  sx={buttonStyle("dataset")}
-                  onClick={handleChooseUploadPath}
-                >
-                  <Typography variant="h6" align="center">
-                    Upload a CSV
-                  </Typography>
-                </Paper>
-              </Grid>
-            </Grid>
-          </AccordionDetails>)}
-
           {lockedStep.method.type=="Manual" && (
             <Grid item xs={12}>
               <DataTableManager/>
@@ -334,6 +179,7 @@ const Dataset2 = () => {
             </Grid>
           )}
         </Grid>
+         
         <AccordionActions sx={{ py: 2 }}>
           <Grid item xs={12}>
             <Grid container spacing={2} justifyContent="center">
@@ -361,7 +207,7 @@ const Dataset2 = () => {
       </Accordion>
     </>
   );
-};
+}
 
-export default Dataset2;
 
+export default Method;
