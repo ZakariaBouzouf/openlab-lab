@@ -326,7 +326,7 @@ const SpecifyRequirements = () => {
                                   disabled={
                                     requirements.goal.length < 1 ||
                                     requirements.goalType.verb.length < 1
-                                  }
+                                   }
                                 >
                                   <DoneIcon />
                                 </IconButton>
@@ -503,7 +503,7 @@ const SpecifyRequirements = () => {
                   }
                   onClick={handleUnlockPath}
                 >
-                  Next
+                Click the checkmark above first!
                 </Button>
               </Grid>
             </Grid>
