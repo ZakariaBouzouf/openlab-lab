@@ -24,11 +24,9 @@ import CloseIcon from "@mui/icons-material/Close";
 const Visualization = () => {
   const {
     requirements,
-    setRequirements,
     lockedStep,
     setLockedStep,
     visRef,
-    setVisRef,
   } = useContext(ISCContext);
   const [state, setState] = useState({
     showSelections: true,
@@ -212,7 +210,7 @@ const Visualization = () => {
                   onClick={
                     lockedStep.visualization.step === "3"
                       ? handleUnlockDataset
-                      : lockedStep.visualization.step === "4"
+                      : lockedStep.visualization.step === "5"
                       ? handleUnlockFinalize
                       : undefined
                   }
