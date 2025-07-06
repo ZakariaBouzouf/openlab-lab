@@ -373,18 +373,48 @@ const TreeMap = ({ customize = false, handleToggleCustomizePanel }) => {
     }));
   };
 
+  // Get selected column
+  const selectedCategoryColumn = state.axisOptions.categoryOptions.find(
+    (col) => col.field === state.axisOptions.selectedCategory
+  );
+
+  const selectedXValueColumn = state.axisOptions.xValueOptions.find(
+    (col) => col.field === state.axisOptions.selectedXValue
+  );
+
+  const selectedValueColumn = state.axisOptions.valueOptions.find(
+    (col) => col.field === state.axisOptions.selectedValue
+  );
+
+  // Determine the label to show based on the column type
+  const CategoryColumnType = selectedCategoryColumn
+    ? (selectedCategoryColumn.type === "string" ? "Categorical" : "Numerical")
+    : "Unknown"; // optional fallback if no column is selecte
+
+  const xValueColumnType = selectedXValueColumn
+    ? (selectedXValueColumn.type === "string" ? "Categorical" : "Numerical")
+    : "Unknown"; // optional fallback if no column is selected
+
+  const valueColumnType = selectedValueColumn
+    ? (selectedValueColumn.type === "string" ? "Categorical" : "Numerical")
+    : "Unknown"; // optional fallback if no column is selected
+
+  const categoryLabel = `Category (${CategoryColumnType})`;
+  const xValueLabel = `X-Value (${xValueColumnType})`;
+  const valueLabel = `Value (${valueColumnType})`;
+
   return (
     <>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="category-select-label">Category</InputLabel>
+            <InputLabel id="category-select-label">{categoryLabel}</InputLabel>
             <Select
               labelId="category-select-label"
               id="category-select"
               value={state.axisOptions.selectedCategory}
               onChange={handleCategoryChange}
-              label="Category"
+              label={categoryLabel}
               variant="outlined"
             >
               {state.axisOptions.categoryOptions.map((col) => (
@@ -397,13 +427,13 @@ const TreeMap = ({ customize = false, handleToggleCustomizePanel }) => {
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="x-value-select-label">X-Value</InputLabel>
+            <InputLabel id="x-value-select-label">{xValueLabel}</InputLabel>
             <Select
               labelId="x-value-select-label"
               id="x-value-select"
               value={state.axisOptions.selectedXValue}
               onChange={handleXValueChange}
-              label="X-Value"
+              label={xValueLabel}
               variant="outlined"
             >
               {state.axisOptions.xValueOptions.map((col) => (
@@ -416,13 +446,13 @@ const TreeMap = ({ customize = false, handleToggleCustomizePanel }) => {
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="value-select-label">Value</InputLabel>
+            <InputLabel id="value-select-label">{valueLabel}</InputLabel>
             <Select
               labelId="value-select-label"
               id="value-select"
               value={state.axisOptions.selectedValue}
               onChange={handleValueChange}
-              label="Value"
+              label={valueLabel}
               variant="outlined"
             >
               {state.axisOptions.valueOptions.map((col) => (
