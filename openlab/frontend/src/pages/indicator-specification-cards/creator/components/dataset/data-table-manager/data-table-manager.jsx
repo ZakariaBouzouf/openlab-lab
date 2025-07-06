@@ -31,7 +31,7 @@ const DataTableManager = () => {
       "& .MuiDataGrid-columnHeaders": {
         cursor: "pointer",
         fontSize: "17px",
-        textDecorationLine: "underline",
+        // textDecorationLine: "underline",
       },
       "& .MuiDataGrid-cell:hover": {
         color: "primary.main",
@@ -147,6 +147,19 @@ const DataTableManager = () => {
     state.page * state.pageSize,
   );
 
+  const columnTypeLabel = dataset.columns.map((col) => {
+    const headerLabel = col.type === "string" ? "Categorical" : "Numerical";
+    return {
+      ...col,
+      renderHeader: (params) => (
+        <div style={{display: "flex", flexDirection: "column", alignItems: "flex-start"}}>
+          <span style={{textDecorationLine: "underline"}}>{params.colDef.headerName}</span>
+          <small style={{fontSize: "0.7rem", color: "#999"}}>{headerLabel}</small>
+        </div>
+      ),
+    };
+  });
+  
   return (
     <>
       <Grid container spacing={2}>
@@ -155,7 +168,7 @@ const DataTableManager = () => {
         </Grid>
         <Grid item xs={12}>
           <DataGrid
-            columns={dataset.columns}
+            columns={columnTypeLabel}
             rows={paginatedRows}
             apiRef={apiRef}
             columnMenuClearIcon={<ClearAllIcon />}

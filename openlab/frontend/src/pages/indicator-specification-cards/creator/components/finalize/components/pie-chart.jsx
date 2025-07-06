@@ -331,18 +331,52 @@ const PieChart = ({ customize = false, handleToggleCustomizePanel }) => {
     }));
   };
 
+  const columnTypeLabel = dataset.columns.map((col) => {
+    const headerLabel = col.type === "string" ? "Categorical" : "Numerical";
+    return {
+      ...col,
+      renderHeader: (params) => (
+        <div style={{display: "flex", flexDirection: "column", alignItems: "flex-start"}}>
+          <span style={{textDecorationLine: "underline"}}>{params.colDef.headerName}</span>
+          <small style={{fontSize: "0.7rem", color: "#999"}}>{headerLabel}</small>
+        </div>
+      ),
+    };
+  });
+
+// Get selected column
+  const selectedXAxisColumn = state.axisOptions.xAxisOptions.find(
+    (col) => col.field === state.axisOptions.selectedXAxis
+  );
+
+  const selectedYAxisColumn = state.axisOptions.yAxisOptions.find(
+    (col) => col.field === state.axisOptions.selectedYAxis
+  );
+
+  // Determine the label to show based on the column type
+  const xAxisColumnType = selectedXAxisColumn
+    ? (selectedXAxisColumn.type === "string" ? "Categorical" : "Numerical")
+    : "Unknown"; // optional fallback if no column is selecte
+
+  const yAxisColumnType = selectedYAxisColumn
+    ? (selectedYAxisColumn.type === "string" ? "Categorical" : "Numerical")
+    : "Unknown"; // optional fallback if no column is selected
+
+  const xAxisLabel = `Categories (${xAxisColumnType})`;
+  const yAxisLabel = `Values (${yAxisColumnType})`;
+
   return (
     <>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth>
-            <InputLabel id="x-axis-select-label">Categories</InputLabel>
+            <InputLabel id="x-axis-select-label">{xAxisLabel}</InputLabel>
             <Select
               labelId="x-axis-select-label"
               id="x-axis-select"
               value={state.axisOptions.selectedXAxis}
               onChange={handleXAxisChange}
-              label="Categories"
+              label={xAxisLabel}
               variant="outlined"
             >
               {state.axisOptions.xAxisOptions.map((col) => (
@@ -355,13 +389,13 @@ const PieChart = ({ customize = false, handleToggleCustomizePanel }) => {
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth>
-            <InputLabel id="y-axis-select-label">Values</InputLabel>
+            <InputLabel id="y-axis-select-label">{yAxisLabel}</InputLabel>
             <Select
               labelId="y-axis-select-label"
               id="y-axis-select"
               value={state.axisOptions.selectedYAxis}
               onChange={handleYAxisChange}
-              label="Values"
+              label={yAxisLabel}
               variant="outlined"
             >
               {state.axisOptions.yAxisOptions.map((col) => (

@@ -352,18 +352,39 @@ const LineChart = ({ customize = false, handleToggleCustomizePanel }) => {
     localStorage.removeItem("series");
   };
 
+  // Get selected column
+  const selectedXAxisColumn = state.axisOptions.xAxisOptions.find(
+    (col) => col.field === state.axisOptions.selectedXAxis
+  );
+
+  // Determine the label to show based on the column type
+  const xAxisColumnType = selectedXAxisColumn
+    ? (selectedXAxisColumn.type === "string" ? "Categorical" : "Numerical")
+    : "Unknown"; // optional fallback if no column is selected
+
+  // If multiple data selected
+  const selectedYAxesColumns = (state.axisOptions.selectedYAxis || []).map((field) => {
+  const col = state.axisOptions.yAxisOptions.find((c) => c.field === field);
+    return col?.type === "string" ? "Categorical" : "Numerical";
+  });
+
+  const yAxesColumnTypes = [...new Set(selectedYAxesColumns)].join(", "); // remove duplicates
+
+  const xAxisLabel = `X-Axis (${xAxisColumnType})`;
+  const yAxesLabel = `Y-Axes (${yAxesColumnTypes})`;
+
   return (
     <>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth>
-            <InputLabel id="x-axis-select-label">X-Axis</InputLabel>
+            <InputLabel id="x-axis-select-label">{xAxisLabel}</InputLabel>
             <Select
               labelId="x-axis-select-label"
               id="x-axis-select"
               value={state.axisOptions.selectedXAxis}
               onChange={handleXAxisChange}
-              label="X-Axis"
+              label={xAxisLabel}
               variant="outlined"
             >
               {state.axisOptions.xAxisOptions.map((col) => (
@@ -376,14 +397,14 @@ const LineChart = ({ customize = false, handleToggleCustomizePanel }) => {
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth>
-            <InputLabel id="y-axes-select-label">Y-Axes</InputLabel>
+            <InputLabel id="y-axes-select-label">{yAxesLabel}</InputLabel>
             <Select
               labelId="y-axes-select-label"
               id="y-axes-select"
               multiple
               value={state.axisOptions.selectedYAxis}
               onChange={handleYAxesChange}
-              label="Y-Axes"
+              label={yAxesLabel}
               variant="outlined"
               renderValue={(selected) =>
                 selected
