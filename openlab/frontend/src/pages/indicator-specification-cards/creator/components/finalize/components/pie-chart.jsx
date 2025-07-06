@@ -331,19 +331,6 @@ const PieChart = ({ customize = false, handleToggleCustomizePanel }) => {
     }));
   };
 
-  const columnTypeLabel = dataset.columns.map((col) => {
-    const headerLabel = col.type === "string" ? "Categorical" : "Numerical";
-    return {
-      ...col,
-      renderHeader: (params) => (
-        <div style={{display: "flex", flexDirection: "column", alignItems: "flex-start"}}>
-          <span style={{textDecorationLine: "underline"}}>{params.colDef.headerName}</span>
-          <small style={{fontSize: "0.7rem", color: "#999"}}>{headerLabel}</small>
-        </div>
-      ),
-    };
-  });
-
 // Get selected column
   const selectedXAxisColumn = state.axisOptions.xAxisOptions.find(
     (col) => col.field === state.axisOptions.selectedXAxis
