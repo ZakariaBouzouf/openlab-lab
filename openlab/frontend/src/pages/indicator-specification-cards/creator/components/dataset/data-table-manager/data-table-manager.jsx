@@ -149,8 +149,10 @@ const DataTableManager = () => {
 
   const columnTypeLabel = dataset.columns.map((col) => {
     const headerLabel = col.type === "string" ? "Categorical" : "Numerical";
+    const isNumber = col.type === "number";
     return {
       ...col,
+      ...(isNumber ? {align:"left", headerAlign: "left"} : {}),
       renderHeader: (params) => (
         <div style={{display: "flex", flexDirection: "column", alignItems: "flex-start"}}>
           <span style={{textDecorationLine: "underline"}}>{params.colDef.headerName}</span>
