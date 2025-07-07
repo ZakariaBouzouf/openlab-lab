@@ -8,30 +8,59 @@ import React, {
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 import { ISCContext } from "../../../indicator-specification-card.jsx";
 import { ClearAll as ClearAllIcon } from "@mui/icons-material";
-import Grid from "@mui/material/Grid2"
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Fade, Grid, IconButton, MenuItem, Paper, TextField, Typography } from "@mui/material";
 import Footer from "./components/footer.jsx";
 import NoRowsOverlay from "./components/no-rows-overlay.jsx";
 import ColumnMenu from "./column-menu/column-menu.jsx";
 import TableHeaderBar from "./components/table-header-bar.jsx";
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Save as SaveIcon,
+  Cancel as CancelIcon,
+  TableRows as TableRowsIcon,
+  ViewColumn as ViewColumnIcon,
+} from '@mui/icons-material';
+import { v4 as uuidv4 } from "uuid"
+import { DataTypes } from "../../../utils/data/config.js";
+
 
 const DataTableManager = () => {
+  const [rowModesModel, setRowModesModel] = useState({});
+  const [showAddRowHover, setShowAddRowHover] = useState(false);
+  const [showAddColumnHover, setShowAddColumnHover] = useState(false);
+  const [openColumnDialog, setOpenColumnDialog] = useState(false);
+  const [newColumnName, setNewColumnName] = useState('');
+  const [newColumnType, setNewColumnType] = useState('string');
+
   const { dataset, setDataset } = useContext(ISCContext);
+  // const [state, setState] = useState({
+  //   cellModesModel: {},
+  //   selectionModel: [],
+  //   value: "",
+  //   anchorEl: null,
+  //   page: 1,
+  //   pageSize: 5,
+  //   gridHeight: 450,
+  // });
   const [state, setState] = useState({
-    cellModesModel: {},
-    selectionModel: [],
-    value: "",
-    anchorEl: null,
-    page: 1,
-    pageSize: 5,
-    gridHeight: 450,
+    columnName: {
+      value: "",
+      exists: false,
+    },
+    typeSelected: Object.values(DataTypes)[0],
+    numberOfRows: dataset.rows.length,
   });
+
+  console.log(dataset)
 
   const style = {
     dataGrid: {
       "& .MuiDataGrid-columnHeaders": {
         cursor: "pointer",
         fontSize: "17px",
-        // textDecorationLine: "underline",
+        textDecorationLine: "underline",
       },
       "& .MuiDataGrid-cell:hover": {
         color: "primary.main",
@@ -142,26 +171,160 @@ const DataTableManager = () => {
     }));
   };
 
+  const handleRowEditStop = (params, event) => {
+    if (params.reason === GridRowEditStopReasons.rowFocusOut) {
+      event.defaultMuiPrevented = true;
+    }
+  };
+
+  const handleEditClick = (id) => () => {
+    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+  };
+
+  const processRowUpdate = (newRow) => {
+    const updatedRow = { ...newRow, isNew: false };
+    setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+    return updatedRow;
+  };
+
+  const handleRowModesModelChange = (newRowModesModel) => {
+    setRowModesModel(newRowModesModel);
+  };
+
+  // const handleAddColumn = (event) => {
+  //   let { value } = event.target;
+  //   setState((prevState) => ({
+  //     ...prevState,
+  //     columnName: {
+  //       ...prevState,
+  //       value: value,
+  //     },
+  //   }));
+  // };
+
+
+  const handleAddRow = () => {
+    const id = Math.max(...rows.map((row) => row.id), 0) + 1;
+    const newRow = {
+      id,
+      name: '',
+      email: '',
+      role: '',
+      department: '',
+      status: 'Active',
+      isNew: true,
+    };
+    setRows([...rows, newRow]);
+    setRowModesModel({
+      ...rowModesModel,
+      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
+    });
+    setShowAddRowHover(false);
+  };
+
   const paginatedRows = dataset.rows.slice(
     (state.page - 1) * state.pageSize,
     state.page * state.pageSize,
   );
 
-  const columnTypeLabel = dataset.columns.map((col) => {
-    const headerLabel = col.type === "string" ? "Categorical" : "Numerical";
-    const isNumber = col.type === "number";
-    return {
-      ...col,
-      ...(isNumber ? {align:"left", headerAlign: "left"} : {}),
-      renderHeader: (params) => (
-        <div style={{display: "flex", flexDirection: "column", alignItems: "flex-start"}}>
-          <span style={{textDecorationLine: "underline"}}>{params.colDef.headerName}</span>
-          <small style={{fontSize: "0.7rem", color: "#999"}}>{headerLabel}</small>
-        </div>
-      ),
-    };
-  });
-  
+  const columnTypes = [
+    { value: 'string', label: 'Text' },
+    { value: 'number', label: 'Number' },
+    { value: 'date', label: 'Date' },
+  ];
+
+  // const handleAddColumn = () => {
+  //   if (newColumnName.trim()) {
+  //     const newColumn = {
+  //       field: newColumnName.toLowerCase().replace(/\s+/g, '_'),
+  //       headerName: newColumnName,
+  //       width: 150,
+  //       editable: true,
+  //       type: newColumnType === 'string' ? undefined : newColumnType,
+  //       ...(newColumnType === 'singleSelect' && {
+  //         valueOptions: ['Option 1', 'Option 2', 'Option 3'],
+  //       }),
+  //     };
+  //
+  //     const actionsColumn = columns.find(col => col.field === 'actions');
+  //     const otherColumns = columns.filter(col => col.field !== 'actions');
+  //
+  //     setColumns([...otherColumns, newColumn, actionsColumn]);
+  //
+  //     // Add default values for the new column to existing rows
+  //     setRows(rows.map(row => ({
+  //       ...row,
+  //       [newColumn.field]: newColumnType === 'number' ? 0 :
+  //         newColumnType === 'boolean' ? false :
+  //           newColumnType === 'date' ? new Date() : '',
+  //     })));
+  //
+  //     setNewColumnName('');
+  //     setNewColumnType('string');
+  //     setOpenColumnDialog(false);
+  //     setShowAddColumnHover(false);
+  //   }
+  // };
+  const handleAddColumn = () => {
+    let fieldUUID = uuidv4();
+    console.log("dv4", fieldUUID)
+    const newColumnData = [
+      ...dataset.columns,
+      {
+        field: fieldUUID,
+        headerName: state.columnName.value,
+        sortable: false,
+        editable: true,
+        width: 200,
+        type: state.typeSelected.type,
+      },
+    ];
+    let newRows = [];
+    if (Boolean(dataset.rows.length)) {
+      newRows = dataset.rows.map((row, index) => ({
+        ...row,
+        [fieldUUID]:
+          state.typeSelected.type === "string"
+            ? `${state.columnName.value} ${index + 1}`
+            : 0,
+      }));
+    } else {
+      for (let i = 0; i < state.numberOfRows; i++) {
+        newRows.push({
+          id: uuidv4(),
+          [fieldUUID]:
+            state.typeSelected.type === "string"
+              ? `${state.columnName.value} ${i + 1}`
+              : 0,
+        });
+      }
+    }
+
+    setState((prevState) => ({
+      ...prevState,
+      columnName: {
+        ...prevState.columnName,
+        value: "",
+        exists: false,
+      },
+      typeSelected: {},
+      numberOfRows: 0,
+    }));
+
+    setDataset((prevState) => ({
+      ...prevState,
+      rows: newRows,
+      columns: newColumnData,
+    }));
+
+    enqueueSnackbar("New column added successfully", {
+      variant: "success",
+    });
+    toggleOpen();
+  };
+
+
+
   return (
     <>
       <Grid spacing={2}>
@@ -169,41 +332,243 @@ const DataTableManager = () => {
           <TableHeaderBar />
         </Grid>
         <Grid item xs={12}>
-          <DataGrid
-            columns={columnTypeLabel}
-            rows={paginatedRows}
-            apiRef={apiRef}
-            columnMenuClearIcon={<ClearAllIcon />}
-            cellModesModel={state.cellModesModel}
-            checkboxSelection
-            disableRowSelectionOnClick={true}
-            disableColumnMenu={false}
-            onColumnHeaderClick={(params) => handleColumnHeaderClick(params)}
-            onCellModesModelChange={handleCellModesModelChange}
-            onCellClick={handleCellClick}
-            onRowSelectionModelChange={(newSelectionModel) =>
-              handleRowSelectionModelChange(newSelectionModel)
-            }
-            pageSizeOptions={[5, 10, 25]}
-            processRowUpdate={handleProcessRowUpdate}
-            rowHeight={40}
-            selectionModel={state.selectionModel}
-            showCellVerticalBorder
-            showFooterRowCount
-            showFooterSelectedRowCount
-            slots={{
-              noRowsOverlay: () => <NoRowsOverlay />,
-              columnMenu: (props) => <ColumnMenu props={props} />,
-              footer: () => <Footer state={state} setState={setState} />,
+          {/* <DataGrid */}
+          {/*   columns={dataset.columns} */}
+          {/*   rows={paginatedRows} */}
+          {/*   apiRef={apiRef} */}
+          {/*   columnMenuClearIcon={<ClearAllIcon />} */}
+          {/*   cellModesModel={state.cellModesModel} */}
+          {/*   checkboxSelection */}
+          {/*   disableRowSelectionOnClick={true} */}
+          {/*   disableColumnMenu={false} */}
+          {/*   onColumnHeaderClick={(params) => handleColumnHeaderClick(params)} */}
+          {/*   onCellModesModelChange={handleCellModesModelChange} */}
+          {/*   onCellClick={handleCellClick} */}
+          {/*   onRowSelectionModelChange={(newSelectionModel) => */}
+          {/*     handleRowSelectionModelChange(newSelectionModel) */}
+          {/*   } */}
+          {/*   pageSizeOptions={[5, 10, 25]} */}
+          {/*   processRowUpdate={handleProcessRowUpdate} */}
+          {/*   rowHeight={40} */}
+          {/*   selectionModel={state.selectionModel} */}
+          {/*   showCellVerticalBorder */}
+          {/*   showFooterRowCount */}
+          {/*   showFooterSelectedRowCount */}
+          {/*   slots={{ */}
+          {/*     noRowsOverlay: () => <NoRowsOverlay />, */}
+          {/*     columnMenu: (props) => <ColumnMenu props={props} />, */}
+          {/*     footer: () => <Footer state={state} setState={setState} />, */}
+          {/*   }} */}
+          {/*   sx={style.dataGrid} */}
+          {/*   componentsProps={{ */}
+          {/*     row: { */}
+          {/*       onMouseEnter: handlePopperOpen, */}
+          {/*       onMouseLeave: handlePopperClose, */}
+          {/*     }, */}
+          {/*   }} */}
+          {/* /> */}
+
+
+          <Paper
+            elevation={0}
+            sx={{
+              position: 'relative',
+              borderRadius: 3,
+              border: '1px solid #e2e8f0',
+              overflow: 'visible',
             }}
-            sx={style.dataGrid}
-            componentsProps={{
-              row: {
-                onMouseEnter: handlePopperOpen,
-                onMouseLeave: handlePopperClose,
-              },
-            }}
-          />
+          >
+            <Box sx={{ position: 'relative', overflow: 'hidden', borderRadius: 3 }}>
+              <DataGrid
+                rows={paginatedRows}
+                columns={dataset.columns}
+                // editMode="row"
+                rowModesModel={rowModesModel}
+                onRowModesModelChange={handleRowModesModelChange}
+                onRowEditStop={handleRowEditStop}
+                processRowUpdate={processRowUpdate}
+                disableColumnMenu={false}
+                slots={{
+                  noRowsOverlay: NoRowsOverlay,
+                }}
+                sx={{
+                  '& .MuiDataGrid-row:hover': {
+                    backgroundColor: '#f8fafc',
+                  },
+                }}
+                disableRowSelectionOnClick
+                hideFooterPagination
+                hideFooterSelectedRowCount
+              />
+
+              {/* Add Row Hover Area - Extended below the table */}
+              <Box
+                sx={{
+                  position: 'absolute',
+                  bottom: -10,
+                  left: 0,
+                  right: 0,
+                  height: 60,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: 'transparent',
+                  zIndex: 10,
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={() => setShowAddRowHover(true)}
+                onMouseLeave={() => setShowAddRowHover(false)}
+                onClick={handleAddRow}
+              >
+                <Fade in={showAddRowHover}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                      border: '2px dashed #2563eb',
+                      borderRadius: 2,
+                      px: 3,
+                      py: 1.5,
+                      transition: 'all 0.2s ease-in-out',
+                      '&:hover': {
+                        backgroundColor: 'rgba(37, 99, 235, 0.15)',
+                        transform: 'translateY(-2px)',
+                      },
+                    }}
+                  >
+                    <IconButton
+                      size="small"
+                      sx={{
+                        backgroundColor: 'primary.main',
+                        color: 'white',
+                        '&:hover': {
+                          backgroundColor: 'primary.dark',
+                        },
+                        boxShadow: 2,
+                      }}
+                    >
+                      <AddIcon fontSize="small" />
+                    </IconButton>
+                    <Typography variant="body2" color="primary.main" fontWeight={500}>
+                      Add Row
+                    </Typography>
+                  </Box>
+                </Fade>
+              </Box>
+
+              {/* Add Column Hover Area - Extended to the right of the table */}
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  right: -5,
+                  width: 80,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: 'transparent',
+                  zIndex: 10,
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={() => setShowAddColumnHover(true)}
+                onMouseLeave={() => setShowAddColumnHover(false)}
+                onClick={() => setOpenColumnDialog(true)}
+              >
+                <Fade in={showAddColumnHover}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: 1,
+                      backgroundColor: 'rgba(100, 116, 139, 0.1)',
+                      border: '2px dashed #64748b',
+                      borderRadius: 2,
+                      px: 2,
+                      py: 3,
+                      transition: 'all 0.2s ease-in-out',
+                      '&:hover': {
+                        backgroundColor: 'rgba(100, 116, 139, 0.15)',
+                        transform: 'translateX(-2px)',
+                      },
+                    }}
+                  >
+                    <IconButton
+                      size="small"
+                      sx={{
+                        backgroundColor: 'secondary.main',
+                        color: 'white',
+                        '&:hover': {
+                          backgroundColor: 'secondary.dark',
+                        },
+                        boxShadow: 2,
+                      }}
+                    >
+                      <ViewColumnIcon fontSize="small" />
+                    </IconButton>
+                    <Typography
+                      variant="caption"
+                      color="secondary.main"
+                      fontWeight={500}
+                      sx={{
+                        writingMode: 'vertical-rl',
+                        textOrientation: 'mixed',
+                      }}
+                    >
+                      Add Column
+                    </Typography>
+                  </Box>
+                </Fade>
+              </Box>
+            </Box>
+          </Paper>
+
+
+          {/* Add dialog for adding new Column */}
+          <Dialog
+            open={openColumnDialog}
+            onClose={() => setOpenColumnDialog(false)}
+            maxWidth="sm"
+            fullWidth
+          >
+            <DialogTitle>Add New Column</DialogTitle>
+            <DialogContent>
+              <TextField
+                autoFocus
+                margin="dense"
+                label="Column Name"
+                fullWidth
+                variant="outlined"
+                value={newColumnName}
+                onChange={(e) => setNewColumnName(e.target.value)}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                select
+                margin="dense"
+                label="Column Type"
+                fullWidth
+                variant="outlined"
+                value={newColumnType}
+                onChange={(e) => setNewColumnType(e.target.value)}
+              >
+                {columnTypes.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpenColumnDialog(false)}>Cancel</Button>
+              <Button onClick={handleAddColumn} variant="contained">
+                Add Column
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Grid>
       </Grid>
     </>
