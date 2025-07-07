@@ -18,6 +18,7 @@ import { DataTypes } from "../../../utils/data/config.js";
 const ImportDialog = ({ open, toggleOpen,importingFile }) => {
   const { dataset, setDataset } = useContext(ISCContext);
 
+  const [fileError, setFileError] = React.useState("");//Modification-1 part 4 (1 row)
   const handleUploadFile = () => {
     const reader = new FileReader();
     reader.onload = async ({ target }) => {
@@ -107,7 +108,8 @@ const ImportDialog = ({ open, toggleOpen,importingFile }) => {
             </Typography>
           </DialogContentText>
 
-          <CsvImporter />
+          <CsvImporter fileError={fileError}
+            setFileError={setFileError}/> {/*Modification-1 part-5 : send fileError & setFileError to CsvImporter component*/ }
         </DialogContent>
         <DialogActions>
           <Button
@@ -120,7 +122,7 @@ const ImportDialog = ({ open, toggleOpen,importingFile }) => {
           </Button>
           <Button
             onClick={handleUploadFile}
-            disabled={dataset.file.name === ""}
+            disabled={!dataset.file.name || !!fileError} //Modification-1 part-7 add Judgement:if fileError exists, then disable the button
             autoFocus
             fullWidth
             variant="contained"
