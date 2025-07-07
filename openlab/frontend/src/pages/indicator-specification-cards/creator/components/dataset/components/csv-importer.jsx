@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext,useState } from "react";
 import {
   Box,
   Grid,
@@ -14,9 +14,9 @@ import {
 import { ISCContext } from "../../../indicator-specification-card.jsx";
 import { Alert } from "@mui/lab";
 
-const CsvImporter = () => {
+const CsvImporter = () => { //Modification-1 part-6 can use setfileError to set error
   const { dataset, setDataset } = useContext(ISCContext);
-  const [fileError, setFileError] = React.useState("");//Modification-1 (1 row)
+  const [fileError, setFileError] = useState("");
   const handleImportFile = (event) => {
   const selectedFile = event.target.files[0];
   if (!selectedFile) return;
@@ -24,7 +24,7 @@ const CsvImporter = () => {
   const isCSV = selectedFile.name.toLowerCase().endsWith(".csv");
 
   if (!isCSV) {
-    //  Set the file name to trigger the display area (Modification-2 part-1 )
+    //  Set the file name to trigger the display area (Modification-1 part-1 )
     setDataset((prevState) => ({
       ...prevState,
       file: { name: selectedFile.name },
