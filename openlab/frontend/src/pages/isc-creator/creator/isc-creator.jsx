@@ -350,7 +350,7 @@ export default function IscCreator() {
     <>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <Typography>ISC Creator</Typography>
+          <Typography>ISC </Typography>
         </Grid>
         <Grid item xs={12}>
           <Divider />

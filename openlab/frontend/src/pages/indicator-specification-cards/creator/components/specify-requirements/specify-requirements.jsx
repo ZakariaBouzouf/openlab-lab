@@ -27,6 +27,8 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useNavigate } from "react-router-dom";
 const SpecifyRequirements = () => {
   const [open, setOpen] = useState(false);
   const [permissionToChange, setPermissionToChange] = useState(false);
@@ -48,7 +50,7 @@ const SpecifyRequirements = () => {
       setPermissionToChange(false);
     }
   },[permissionToChange])
-
+  const navigate = useNavigate(); // <--- Zurück zur Dashboard-Navigation
 
   const handleTogglePanel = () => {
     setLockedStep((prevState) => ({
@@ -186,6 +188,18 @@ const SpecifyRequirements = () => {
 
   return (
     <>
+      <div style={{ marginBottom: 6 }}>
+        <Tooltip title="Back to ISCs List" placement="right">
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => navigate("/isc")}
+            startIcon={<ArrowBackIcon />}
+          >
+            {/* Kein Text, nur Icon */}
+          </Button>
+        </Tooltip>
+      </div>
       <Accordion expanded={lockedStep.requirements.openPanel}>
         <AccordionSummary>
           <Grid container spacing={1}>
