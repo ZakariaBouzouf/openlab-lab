@@ -19,7 +19,7 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 
-const Dataset2 = () => {
+const Dataset = () => {
   const { requirements, setRequirements, lockedStep, setLockedStep,dataset } =
     useContext(ISCContext);
   const [state, setState] = useState({
@@ -246,7 +246,7 @@ const Dataset2 = () => {
                 onClick={handleChooseManualPath}
               >
                 <Typography variant="h6" align="center">
-                  create you own data set 
+                  Create you own data set 
                 </Typography>
               </Paper>
             </Grid>
@@ -270,5 +270,5 @@ const Dataset2 = () => {
   );
 };
 
-export default Dataset2;
+export default Dataset;
 
