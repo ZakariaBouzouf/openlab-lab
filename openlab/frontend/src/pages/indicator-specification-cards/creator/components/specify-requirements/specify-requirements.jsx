@@ -45,7 +45,14 @@ const SpecifyRequirements = () => {
     showGoalCheckmarkTip: false,
   });
 
-<<<<<<< HEAD
+  useEffect(()=>{
+    if(permissionToChange){
+      addNewColumnsMethod();
+      setPermissionToChange(false);
+    }
+  },[permissionToChange])
+
+
   // pop up prompt after user stops typing for a while
   React.useEffect(() => {
     let timer;
@@ -64,16 +71,6 @@ const SpecifyRequirements = () => {
       clearTimeout(timer);
     };
   }, [requirements.edit.goal, requirements.goalType.verb, requirements.goal]);
-=======
-  useEffect(()=>{
-    if(permissionToChange){
-      addNewColumnsMethod();
-      setPermissionToChange(false);
-    }
-  },[permissionToChange])
-
-
->>>>>>> origin/main
   const handleTogglePanel = () => {
     setLockedStep((prevState) => ({
       ...prevState,
@@ -121,18 +118,9 @@ const SpecifyRequirements = () => {
   console.log("Dataset",dataset)
   console.log("Requirement",requirements)
   const handleUnlockPath = () => {
-<<<<<<< HEAD
     handleTogglePanel();
     // 无论 lockedStep.path.locked 是否为 true，每次都强制刷新 columns/rows，保证推荐和表格刷新
     addNewColumnsMethod();
-=======
-    if (lockedStep.path.locked) {
-      addNewColumnsMethod();
-      handleTogglePanel();
-    }else{
-      handleClickOpen()
-    }
->>>>>>> origin/main
     setLockedStep((prevState) => ({
       ...prevState,
       path: {
