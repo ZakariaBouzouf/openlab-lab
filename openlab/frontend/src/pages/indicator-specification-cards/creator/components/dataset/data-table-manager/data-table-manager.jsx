@@ -31,7 +31,7 @@ const DataTableManager = () => {
       "& .MuiDataGrid-columnHeaders": {
         cursor: "pointer",
         fontSize: "17px",
-        textDecorationLine: "underline",
+        // textDecorationLine: "underline",
       },
       "& .MuiDataGrid-cell:hover": {
         color: "primary.main",
@@ -147,20 +147,21 @@ const DataTableManager = () => {
     state.page * state.pageSize,
   );
 
-  const modifiedColumns = dataset.columns.map((col) => {
-    // Remove existing suffix if present (to avoid duplicate suffix on re-render)
-    const baseName = col.headerName.replace(/\s\((Categorical|Numerical)\)$/, "");
-
-    // Determine suffix based on column type
-    const suffix = col.type === "string" ? "Categorical" : "Numerical";
-    
-    // Return new column object with updated header name
+  const columnTypeLabel = dataset.columns.map((col) => {
+    const headerLabel = col.type === "string" ? "Categorical" : "Numerical";
+    const isNumber = col.type === "number";
     return {
-    ...col,
-    headerName: `${baseName} (${suffix})`,
+      ...col,
+      ...(isNumber ? {align:"left", headerAlign: "left"} : {}),
+      renderHeader: (params) => (
+        <div style={{display: "flex", flexDirection: "column", alignItems: "flex-start"}}>
+          <span style={{textDecorationLine: "underline"}}>{params.colDef.headerName}</span>
+          <small style={{fontSize: "0.7rem", color: "#999"}}>{headerLabel}</small>
+        </div>
+      ),
     };
   });
-
+  
   return (
     <>
       <Grid container spacing={2}>
@@ -169,7 +170,7 @@ const DataTableManager = () => {
         </Grid>
         <Grid item xs={12}>
           <DataGrid
-            columns={modifiedColumns}
+            columns={columnTypeLabel}
             rows={paginatedRows}
             apiRef={apiRef}
             columnMenuClearIcon={<ClearAllIcon />}

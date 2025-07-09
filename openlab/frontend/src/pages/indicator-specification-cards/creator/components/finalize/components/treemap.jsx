@@ -374,44 +374,47 @@ const TreeMap = ({ customize = false, handleToggleCustomizePanel }) => {
   };
 
   // Get selected column
-  const selectedColumn = state.axisOptions.categoryOptions.find(
+  const selectedCategoryColumn = state.axisOptions.categoryOptions.find(
     (col) => col.field === state.axisOptions.selectedCategory
   );
 
-  const selectedYColumn = state.axisOptions.xValueOptions.find(
+  const selectedXValueColumn = state.axisOptions.xValueOptions.find(
     (col) => col.field === state.axisOptions.selectedXValue
   );
 
-  const selectedZColumn = state.axisOptions.valueOptions.find(
+  const selectedValueColumn = state.axisOptions.valueOptions.find(
     (col) => col.field === state.axisOptions.selectedValue
   );
 
   // Determine the label to show based on the column type
-  // If column type is "string", label is "Categorical", otherwise "Numerical"
-  const typeLabel = selectedColumn
-    ? (selectedColumn.type === "string" ? "Categorical" : "Numerical")
+  const CategoryColumnType = selectedCategoryColumn
+    ? (selectedCategoryColumn.type === "string" ? "Categorical" : "Numerical")
+    : "Unknown"; // optional fallback if no column is selecte
+
+  const xValueColumnType = selectedXValueColumn
+    ? (selectedXValueColumn.type === "string" ? "Categorical" : "Numerical")
     : "Unknown"; // optional fallback if no column is selected
 
-  const typeYLabel = selectedYColumn
-    ? (selectedYColumn.type === "string" ? "Categorical" : "Numerical")
+  const valueColumnType = selectedValueColumn
+    ? (selectedValueColumn.type === "string" ? "Categorical" : "Numerical")
     : "Unknown"; // optional fallback if no column is selected
-    
-  const typeZLabel = selectedZColumn
-    ? (selectedZColumn.type === "string" ? "Categorical" : "Numerical")
-    : "Unknown"; // optional fallback if no column is selected
+
+  const categoryLabel = `Category (${CategoryColumnType})`;
+  const xValueLabel = `X-Value (${xValueColumnType})`;
+  const valueLabel = `Value (${valueColumnType})`;
 
   return (
     <>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="category-select-label">Category ({typeLabel})</InputLabel>
+            <InputLabel id="category-select-label">{categoryLabel}</InputLabel>
             <Select
               labelId="category-select-label"
               id="category-select"
               value={state.axisOptions.selectedCategory}
               onChange={handleCategoryChange}
-              label="Category-Column-Type"
+              label={categoryLabel}
               variant="outlined"
             >
               {state.axisOptions.categoryOptions.map((col) => (
@@ -424,13 +427,13 @@ const TreeMap = ({ customize = false, handleToggleCustomizePanel }) => {
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="x-value-select-label">X-Value  ({typeYLabel})</InputLabel>
+            <InputLabel id="x-value-select-label">{xValueLabel}</InputLabel>
             <Select
               labelId="x-value-select-label"
               id="x-value-select"
               value={state.axisOptions.selectedXValue}
               onChange={handleXValueChange}
-              label="X-Value-Column-Type"
+              label={xValueLabel}
               variant="outlined"
             >
               {state.axisOptions.xValueOptions.map((col) => (
@@ -443,13 +446,13 @@ const TreeMap = ({ customize = false, handleToggleCustomizePanel }) => {
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="value-select-label">Value  ({typeZLabel})</InputLabel>
+            <InputLabel id="value-select-label">{valueLabel}</InputLabel>
             <Select
               labelId="value-select-label"
               id="value-select"
               value={state.axisOptions.selectedValue}
               onChange={handleValueChange}
-              label="Value-Column-Type"
+              label={valueLabel}
               variant="outlined"
             >
               {state.axisOptions.valueOptions.map((col) => (

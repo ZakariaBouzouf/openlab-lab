@@ -419,44 +419,47 @@ const ScatterPlotChart = ({
   };
 
   // Get selected column
-  const selectedColumn = state.axisOptions.xAxisOptions.find(
+  const selectedXAxisColumn = state.axisOptions.xAxisOptions.find(
     (col) => col.field === state.axisOptions.selectedXAxis
   );
 
-  const selectedYColumn = state.axisOptions.yAxisOptions.find(
+  const selectedYAxisColumn = state.axisOptions.yAxisOptions.find(
     (col) => col.field === state.axisOptions.selectedYAxis
   );
 
-  const selectedZColumn = state.axisOptions.labelOptions.find(
+  const selectedLabelColumn = state.axisOptions.labelOptions.find(
     (col) => col.field === state.axisOptions.selectedLabel
   );
 
   // Determine the label to show based on the column type
-  // If column type is "string", label is "Categorical", otherwise "Numerical"
-  const typeLabel = selectedColumn
-    ? (selectedColumn.type === "string" ? "Categorical" : "Numerical")
+  const xAxisColumnType = selectedXAxisColumn
+    ? (selectedXAxisColumn.type === "string" ? "Categorical" : "Numerical")
+    : "Unknown"; // optional fallback if no column is selecte
+
+  const yAxisColumnType = selectedYAxisColumn
+    ? (selectedYAxisColumn.type === "string" ? "Categorical" : "Numerical")
     : "Unknown"; // optional fallback if no column is selected
 
-  const typeYLabel = selectedYColumn
-    ? (selectedYColumn.type === "string" ? "Categorical" : "Numerical")
+  const labelColumnType = selectedLabelColumn
+    ? (selectedLabelColumn.type === "string" ? "Categorical" : "Numerical")
     : "Unknown"; // optional fallback if no column is selected
 
-    const typeZLabel = selectedZColumn
-    ? (selectedZColumn.type === "string" ? "Categorical" : "Numerical")
-    : "Unknown"; // optional fallback if no column is selected
+  const xAxisLabel = `X-Axis (${xAxisColumnType})`;
+  const yAxisLabel = `Y-Axis (${yAxisColumnType})`;
+  const labels = `Labels (${labelColumnType})`;
 
   return (
     <>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="x-axis-select-label">X Axis ({typeLabel})</InputLabel>
+            <InputLabel id="x-axis-select-label">{xAxisLabel}</InputLabel>
             <Select
               labelId="x-axis-select-label"
               id="x-axis-select"
               value={state.axisOptions.selectedXAxis}
               onChange={handleXAxisChange}
-              label="X-Axis-Column-Type"
+              label={xAxisLabel}
               variant="outlined"
             >
               {state.axisOptions.xAxisOptions.map((col) => (
@@ -469,13 +472,13 @@ const ScatterPlotChart = ({
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="y-axis-select-label">Y Axis ({typeYLabel})</InputLabel>
+            <InputLabel id="y-axis-select-label">{yAxisLabel}</InputLabel>
             <Select
               labelId="y-axis-select-label"
               id="y-axis-select"
               value={state.axisOptions.selectedYAxis}
               onChange={handleYAxisChange}
-              label="Y-Axis-Column-Type"
+              label={yAxisLabel}
               variant="outlined"
             >
               {state.axisOptions.yAxisOptions.map((col) => (
@@ -488,13 +491,13 @@ const ScatterPlotChart = ({
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="label-select-label">Labels ({typeZLabel})</InputLabel>
+            <InputLabel id="label-select-label">{labels}</InputLabel>
             <Select
               labelId="label-select-label"
               id="label-select"
               value={state.axisOptions.selectedLabel}
               onChange={handleLabelChange}
-              label="Labels-Column-Type"
+              label={labels}
               variant="outlined"
             >
               {state.axisOptions.labelOptions.map((col) => (

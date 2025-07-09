@@ -351,36 +351,38 @@ const DotChart = ({ customize = false, handleToggleCustomizePanel }) => {
   };
 
   // Get selected column
-  const selectedColumn = state.axisOptions.xAxisOptions.find(
+  const selectedXAxisColumn = state.axisOptions.xAxisOptions.find(
     (col) => col.field === state.axisOptions.selectedXAxis
   );
 
-  const selectedYColumn = state.axisOptions.yAxisOptions.find(
+  const selectedYAxisColumn = state.axisOptions.yAxisOptions.find(
     (col) => col.field === state.axisOptions.selectedYAxis
   );
 
   // Determine the label to show based on the column type
-  // If column type is "string", label is "Categorical", otherwise "Numerical"
-  const typeLabel = selectedColumn
-    ? (selectedColumn.type === "string" ? "Categorical" : "Numerical")
+  const xAxisColumnType = selectedXAxisColumn
+    ? (selectedXAxisColumn.type === "string" ? "Categorical" : "Numerical")
+    : "Unknown"; // optional fallback if no column is selecte
+
+  const yAxisColumnType = selectedYAxisColumn
+    ? (selectedYAxisColumn.type === "string" ? "Categorical" : "Numerical")
     : "Unknown"; // optional fallback if no column is selected
 
-  const typeYLabel = selectedYColumn
-    ? (selectedYColumn.type === "string" ? "Categorical" : "Numerical")
-    : "Unknown"; // optional fallback if no column is selected
+  const xAxisLabel = `X-Axis (${xAxisColumnType})`;
+  const yAxisLabel = `Y-Axis (${yAxisColumnType})`;
 
   return (
     <>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth>
-            <InputLabel id="x-axis-select-label">X-Axis ({typeLabel})</InputLabel>
+            <InputLabel id="x-axis-select-label">{xAxisLabel}</InputLabel>
             <Select
               labelId="x-axis-select-label"
               id="x-axis-select"
               value={state.axisOptions.selectedXAxis}
               onChange={handleXAxisChange}
-              label="X-Axis-Column-Type"
+              label={xAxisLabel}
               variant="outlined"
             >
               {state.axisOptions.xAxisOptions.map((col) => (
@@ -393,13 +395,13 @@ const DotChart = ({ customize = false, handleToggleCustomizePanel }) => {
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth>
-            <InputLabel id="y-axis-select-label">Y-Axis ({typeYLabel})</InputLabel>
+            <InputLabel id="y-axis-select-label">{yAxisLabel}</InputLabel>
             <Select
               labelId="y-axis-select-label"
               id="y-axis-select"
               value={state.axisOptions.selectedYAxis}
               onChange={handleYAxisChange}
-              label="Y-Axis-Column-Type"
+              label={yAxisLabel}
               variant="outlined"
             >
               {state.axisOptions.yAxisOptions.map((col) => (

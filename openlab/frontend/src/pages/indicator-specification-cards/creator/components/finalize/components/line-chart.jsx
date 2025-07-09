@@ -353,40 +353,38 @@ const LineChart = ({ customize = false, handleToggleCustomizePanel }) => {
   };
 
   // Get selected column
-  const selectedColumn = state.axisOptions.xAxisOptions.find(
+  const selectedXAxisColumn = state.axisOptions.xAxisOptions.find(
     (col) => col.field === state.axisOptions.selectedXAxis
   );
 
-  const selectedYColumn = state.axisOptions.yAxisOptions.find(
-    (col) => col.field === state.axisOptions.selectedYAxis
-  );
-
   // Determine the label to show based on the column type
-  // If column type is "string", label is "Categorical", otherwise "Numerical"
-  const typeLabel = selectedColumn
-    ? (selectedColumn.type === "string" ? "Categorical" : "Numerical")
+  const xAxisColumnType = selectedXAxisColumn
+    ? (selectedXAxisColumn.type === "string" ? "Categorical" : "Numerical")
     : "Unknown"; // optional fallback if no column is selected
 
   // If multiple data selected
-  const yTypes = (state.axisOptions.selectedYAxis || []).map((field) => {
+  const selectedYAxesColumns = (state.axisOptions.selectedYAxis || []).map((field) => {
   const col = state.axisOptions.yAxisOptions.find((c) => c.field === field);
     return col?.type === "string" ? "Categorical" : "Numerical";
   });
 
-  const typeYLabel = [...new Set(yTypes)].join(", "); // remove duplicates
+  const yAxesColumnTypes = [...new Set(selectedYAxesColumns)].join(", "); // remove duplicates
+
+  const xAxisLabel = `X-Axis (${xAxisColumnType})`;
+  const yAxesLabel = `Y-Axes (${yAxesColumnTypes})`;
 
   return (
     <>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth>
-            <InputLabel id="x-axis-select-label">X-Axis ({typeLabel})</InputLabel>
+            <InputLabel id="x-axis-select-label">{xAxisLabel}</InputLabel>
             <Select
               labelId="x-axis-select-label"
               id="x-axis-select"
               value={state.axisOptions.selectedXAxis}
               onChange={handleXAxisChange}
-              label="X-Axis-Column-Type"
+              label={xAxisLabel}
               variant="outlined"
             >
               {state.axisOptions.xAxisOptions.map((col) => (
@@ -399,14 +397,14 @@ const LineChart = ({ customize = false, handleToggleCustomizePanel }) => {
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth>
-            <InputLabel id="y-axes-select-label">Y-Axes ({typeYLabel})</InputLabel>
+            <InputLabel id="y-axes-select-label">{yAxesLabel}</InputLabel>
             <Select
               labelId="y-axes-select-label"
               id="y-axes-select"
               multiple
               value={state.axisOptions.selectedYAxis}
               onChange={handleYAxesChange}
-              label="Y-Axes-Column-Type"
+              label={yAxesLabel}
               variant="outlined"
               renderValue={(selected) =>
                 selected
