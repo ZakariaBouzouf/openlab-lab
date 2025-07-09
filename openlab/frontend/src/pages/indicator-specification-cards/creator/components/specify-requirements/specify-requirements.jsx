@@ -13,6 +13,8 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 import { ISCContext } from "../../indicator-specification-card.jsx";
 import GoalList from "./components/goal-list.jsx";
 import DataList from "./components/data-list.jsx";
@@ -34,8 +36,27 @@ const SpecifyRequirements = () => {
   } = useContext(ISCContext);
   const [state, setState] = useState({
     showSelections: true,
+    showGoalCheckmarkTip: false,
   });
 
+  // pop up prompt after user stops typing for a while
+  React.useEffect(() => {
+    let timer;
+    if (
+      requirements.edit.goal &&
+      requirements.goalType.verb.length > 0 &&
+      requirements.goal.length > 0
+    ) {
+      timer = setTimeout(() => {
+        setState((prev) => ({ ...prev, showGoalCheckmarkTip: true }));
+      }, 2500); // pop up after 2.5 seconds
+    } else {
+      setState((prev) => ({ ...prev, showGoalCheckmarkTip: false }));
+    }
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [requirements.edit.goal, requirements.goalType.verb, requirements.goal]);
   const handleTogglePanel = () => {
     setLockedStep((prevState) => ({
       ...prevState,
@@ -130,6 +151,8 @@ const SpecifyRequirements = () => {
         question: true,
       },
     }));
+    // close the prompt
+    setState((prev) => ({ ...prev, showGoalCheckmarkTip: false }));
   };
 
   const handleToggleQuestionEdit = () => {
@@ -148,6 +171,17 @@ const SpecifyRequirements = () => {
 
   return (
     <>
+      {/* Snackbar prompt */}
+      <Snackbar
+        open={state.showGoalCheckmarkTip}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        autoHideDuration={4000}
+        onClose={() => setState((prev) => ({ ...prev, showGoalCheckmarkTip: false }))}
+      >
+        <MuiAlert severity="info" sx={{ width: '100%' }}>
+          Please click the checkmark on the right to confirm.
+        </MuiAlert>
+      </Snackbar>
       <Accordion expanded={lockedStep.requirements.openPanel}>
         <AccordionSummary>
           <Grid container spacing={1}>
@@ -319,7 +353,7 @@ const SpecifyRequirements = () => {
                               />
                             </Grid>
                             <Grid item>
-                              <Tooltip title="Confirm">
+                              {/* <Tooltip title="Confirm">
                                 <IconButton
                                   color="primary"
                                   onClick={handleToggleGoalEdit}
@@ -330,6 +364,48 @@ const SpecifyRequirements = () => {
                                 >
                                   <DoneIcon />
                                 </IconButton>
+                              </Tooltip> */}
+                              <style>
+                              {`
+                              @keyframes checkmark-bounce {
+                                0% { transform: scale(1);}
+                                30% { transform: scale(1.18);}
+                                60% { transform: scale(0.95);}
+                                100% { transform: scale(1.15);}
+                              }
+                              `}
+                              </style>
+                              <Tooltip
+                                title={state.showGoalCheckmarkTip ? "Confirm" : "Confirm"}
+                                open={state.showGoalCheckmarkTip || undefined}
+                                placement="top"
+                                arrow
+                              >
+                                <span>
+                                  <IconButton
+                                    color="primary"
+                                    onClick={handleToggleGoalEdit}
+                                    disabled={
+                                      requirements.goal.length < 1 ||
+                                      requirements.goalType.verb.length < 1
+                                    }
+                                    sx={
+                                      requirements.goal.length > 0 &&
+                                      requirements.goalType.verb.length > 0 &&
+                                      requirements.edit.goal
+                                        ? {
+                                            animation: 'checkmark-bounce 0.7s',
+                                            backgroundColor: '#1976d2',
+                                            color: '#fff',
+                                            transform: 'scale(1.15)',
+                                            boxShadow: '0 0 8px #1976d2',
+                                          }
+                                        : undefined
+                                    }
+                                  >
+                                    <DoneIcon />
+                                  </IconButton>
+                                </span>
                               </Tooltip>
                             </Grid>
                           </Grid>
@@ -503,7 +579,7 @@ const SpecifyRequirements = () => {
                   }
                   onClick={handleUnlockPath}
                 >
-                Click the checkmark above first!
+                NEXT
                 </Button>
               </Grid>
             </Grid>
