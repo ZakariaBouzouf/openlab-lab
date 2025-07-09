@@ -84,9 +84,8 @@ const SpecifyRequirements = () => {
 
   const handleUnlockPath = () => {
     handleTogglePanel();
-    if (lockedStep.path.locked) {
-      addNewColumnsMethod();
-    }
+    // 无论 lockedStep.path.locked 是否为 true，每次都强制刷新 columns/rows，保证推荐和表格刷新
+    addNewColumnsMethod();
     setLockedStep((prevState) => ({
       ...prevState,
       path: {
@@ -100,7 +99,9 @@ const SpecifyRequirements = () => {
   const addNewColumnsMethod = () => {
     let tempColumnData = [];
     let tempRows = [];
-    requirements.data.forEach((item) => {
+    // 只用 value 和 type 都有效的数据项
+    const validData = requirements.data.filter(item => item.value && item.type && Object.values(item.type).length !== 0);
+    validData.forEach((item) => {
       let fieldUUID = uuidv4();
       tempColumnData.push({
         field: fieldUUID,
@@ -127,10 +128,8 @@ const SpecifyRequirements = () => {
         }
       }
     });
-    if (
-      requirements.data.some((item) => Object.values(item.type).length !== 0) &&
-      requirements.data.some((item) => item.value !== "")
-    ) {
+    // 只要有有效数据就 setDataset
+    if (validData.length > 0) {
       setDataset((prevState) => ({
         ...prevState,
         rows: tempRows,
