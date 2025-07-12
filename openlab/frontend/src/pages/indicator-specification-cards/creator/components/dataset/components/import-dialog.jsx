@@ -15,7 +15,7 @@ import Papa from "papaparse";
 import { v4 as uuidv4 } from "uuid";
 import { DataTypes } from "../../../utils/data/config.js";
 
-const ImportDialog = ({ open, toggleOpen }) => {
+const ImportDialog = ({ open, toggleOpen,importingFile }) => {
   const { dataset, setDataset } = useContext(ISCContext);
 
   const handleUploadFile = () => {
@@ -35,6 +35,7 @@ const ImportDialog = ({ open, toggleOpen }) => {
       setDataset((prevState) => ({
         ...prevState,
         file: {
+          ...prevState.file,
           name: "",
         },
         rows: newRowData,
@@ -44,6 +45,7 @@ const ImportDialog = ({ open, toggleOpen }) => {
     };
     reader.readAsText(dataset.file);
     toggleOpen();
+    importingFile();
   };
 
   const cleanRowData = (rowData) => {

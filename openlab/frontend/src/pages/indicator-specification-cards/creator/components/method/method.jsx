@@ -19,19 +19,31 @@ import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import DataTableManager from "../dataset/data-table-manager/data-table-manager.jsx";
 import ImportDialog from "../dataset/components/import-dialog.jsx";
+import DataTable from "../dataset/components/data-table.jsx"
 
 const Method = () => {
-  const { requirements, lockedStep, setLockedStep, dataset } =
+  const { requirements, lockedStep, setLockedStep, dataset,setDataset } =
     useContext(ISCContext);
   const [state, setState] = useState({
     showSelections: true,
     openCsvImport: false,
+    fileImported: false,
   });
 
   const handleOpenImportDataset = () => {
     setState((prevState) => ({
       ...prevState,
       openCsvImport: !prevState.openCsvImport,
+    }));
+  };
+
+  const handleImportingFile = () => {
+    setDataset((prevState) => ({
+      ...prevState,
+      file:{
+        ...prevState.file,
+        uploaded : true
+      }
     }));
   };
 
@@ -193,7 +205,13 @@ const Method = () => {
               <ImportDialog
                 open={state.openCsvImport}
                 toggleOpen={handleOpenImportDataset}
+                importingFile={handleImportingFile}
               />
+              {dataset.file.uploaded && (
+                <Grid sx={{ py: 2 }}>
+                  <DataTable rows={dataset.rows} columns={dataset.columns} />
+                </Grid>
+              )}
             </Grid>
           )}
         </Grid>
