@@ -169,7 +169,6 @@ const BarChart = ({ customize = false, handleToggleCustomizePanel }) => {
     },
   });
 
-  console.log("state",state)
   // * This effect is used to update the chart when the dark mode changes.
   useEffect(() => {
     setState((prevState) => ({
@@ -366,7 +365,6 @@ const BarChart = ({ customize = false, handleToggleCustomizePanel }) => {
   };
 
   const handleYAxisChange = (event) => {
-    console.log("Y axis",event)
     setState((prevState) => ({
       ...prevState,
       axisOptions: {

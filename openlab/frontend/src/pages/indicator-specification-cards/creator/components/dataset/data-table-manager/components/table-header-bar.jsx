@@ -57,11 +57,6 @@ const TableHeaderBar = () => {
 
         <Grid item>
           <Grid container spacing={2} alignItems="center">
-            {/* <Grid item> */}
-            {/*   <Button variant="contained" onClick={handleOpenImportDataset}> */}
-            {/*     Upload CSV */}
-            {/*   </Button> */}
-            {/* </Grid> */}
             <Grid item>
               <Tooltip
                 arrow
