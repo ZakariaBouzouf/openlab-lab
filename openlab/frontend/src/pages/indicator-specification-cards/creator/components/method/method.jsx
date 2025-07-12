@@ -12,21 +12,28 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid2"
 import { ISCContext } from "../../indicator-specification-card.jsx";
-import { blue, orange } from "@mui/material/colors";
 import LockIcon from "@mui/icons-material/Lock";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import DataTableManager from "../dataset/data-table-manager/data-table-manager.jsx";
-import UploadCSV from "../dataset/upload-csv/uploadCSV.jsx";
+import ImportDialog from "../dataset/components/import-dialog.jsx";
 
-const Method = () =>{
-  const { requirements, lockedStep, setLockedStep,dataset } =
+const Method = () => {
+  const { requirements, lockedStep, setLockedStep, dataset } =
     useContext(ISCContext);
   const [state, setState] = useState({
     showSelections: true,
+    openCsvImport: false,
   });
+
+  const handleOpenImportDataset = () => {
+    setState((prevState) => ({
+      ...prevState,
+      openCsvImport: !prevState.openCsvImport,
+    }));
+  };
 
   const handleTogglePanel = () => {
     setLockedStep((prevState) => ({
@@ -150,7 +157,7 @@ const Method = () =>{
               <Grid item xs={12}>
                 {requirements.selectedPath !== "" && (
                   <Grid item xs={12} spacing={4}>
-                    {requirements.selectedMethod !== "" &&(
+                    {requirements.selectedMethod !== "" && (
                       <Grid container alignItems="center" spacing={1}>
                         <Grid item>
                           <Typography>Selected method:</Typography>
@@ -168,18 +175,29 @@ const Method = () =>{
         </AccordionSummary>
 
         <Grid item spacing={2} sx={{ pl: 1 }}>
-          {lockedStep.method.type=="Manual" && (
+          {lockedStep.method.type == "Manual" && (
             <Grid item xs={12}>
-              <DataTableManager/>
+              <DataTableManager />
             </Grid>
           )}
-          {lockedStep.method.type=="Upload" && (
+          {lockedStep.method.type == "Upload" && (
             <Grid item xs={12}>
-              <UploadCSV/>
+              <Grid container sx={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}>
+                <Button variant="contained" onClick={handleOpenImportDataset}>
+                  Upload CSV
+                </Button>
+              </Grid >
+              <ImportDialog
+                open={state.openCsvImport}
+                toggleOpen={handleOpenImportDataset}
+              />
             </Grid>
           )}
         </Grid>
-         
+
         <AccordionActions sx={{ py: 2 }}>
           <Grid item xs={12}>
             <Grid container spacing={2} justifyContent="center">
@@ -194,8 +212,8 @@ const Method = () =>{
                     lockedStep.dataset.step === "3"
                       ? handleUnlockVisualization
                       : lockedStep.dataset.step === "4"
-                      ? handleUnlockFinalize
-                      : undefined
+                        ? handleUnlockFinalize
+                        : undefined
                   }
                 >
                   Next
