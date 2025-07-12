@@ -26,9 +26,6 @@ const Dataset = () => {
     showSelections: true,
   });
 
-  console.log("lockedStep ",lockedStep)
-  console.log("dataset ",dataset)
-
   const handleChooseManualPath = () => {
     let vis = "Manual";
     handleTogglePanel();

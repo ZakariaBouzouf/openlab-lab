@@ -61,7 +61,7 @@ const IndicatorSpecificationCard = () => {
     return savedState
       ? JSON.parse(savedState).dataset
       : {
-          file: { name: "" },
+          file: { name: "",uploaded: false },
           rows: [],
           columns: [],
         };
