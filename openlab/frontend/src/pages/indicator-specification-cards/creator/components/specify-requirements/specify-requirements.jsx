@@ -99,6 +99,7 @@ const SpecifyRequirements = () => {
   console.log("Dataset",dataset)
   console.log("Requirement",requirements)
   const handleUnlockPath = () => {
+    //TODO: check fifan optimization
     if (lockedStep.path.locked) {
       addNewColumnsMethod();
       handleTogglePanel();
@@ -119,7 +120,9 @@ const SpecifyRequirements = () => {
   const addNewColumnsMethod = () => {
     let tempColumnData = [];
     let tempRows = [];
-    requirements.data.forEach((item) => {
+    // Only include data items where both value and type are valid.
+    const validData = requirements.data.filter(item => item.value && item.type && Object.values(item.type).length !== 0);
+    validData.forEach((item) => {
       let fieldUUID = uuidv4();
       tempColumnData.push({
         field: fieldUUID,
@@ -146,10 +149,8 @@ const SpecifyRequirements = () => {
         }
       }
     });
-    if (
-      requirements.data.some((item) => Object.values(item.type).length !== 0) &&
-      requirements.data.some((item) => item.value !== "")
-    ) {
+    // Set the dataset only if there is valid data.
+    if (validData.length > 0) {
       setDataset((prevState) => ({
         ...prevState,
         rows: tempRows,
@@ -188,6 +189,21 @@ const SpecifyRequirements = () => {
 
   return (
     <>
+
+
+      {/* Snackbar prompt */}
+      <Snackbar
+        open={state.showGoalCheckmarkTip}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        autoHideDuration={4000}
+        onClose={() => setState((prev) => ({ ...prev, showGoalCheckmarkTip: false }))}
+      >
+
+
+        <MuiAlert severity="info" sx={{ width: '100%' }}>
+          Please click the checkmark on the right to confirm.
+        </MuiAlert>
+      </Snackbar>
       <Accordion expanded={lockedStep.requirements.openPanel}>
         <AccordionSummary>
           <Grid container spacing={1}>
@@ -343,8 +359,28 @@ const SpecifyRequirements = () => {
                     <Grid item xs={12} md={8}>
                       <Grid container spacing={2}>
                         <Grid item xs sm={4}>
-                          <GoalList />
+                          <GoalList addButtonClassName="goallist-add-btn" />
                         </Grid>
+      <style>
+      {`
+        .goallist-add-btn {
+          background-color: #1976d2 !important;
+          color: #fff !important;
+          border-radius: 8px !important;
+          font-size: 1.1rem !important;
+          font-weight: 500 !important;
+          box-shadow: none !important;
+          padding: 8px 24px !important;
+          margin-top: 8px !important;
+          margin-bottom: 8px !important;
+          transition: background 0.2s, color 0.2s;
+        }
+        .goallist-add-btn:hover:not(:disabled) {
+          background-color: #1565c0 !important;
+          color: #fff !important;
+        }
+      `}
+      </style>
                         <Grid item xs={12} sm>
                           <Grid container spacing={2} alignItems="center">
                             <Grid item xs>
@@ -366,10 +402,66 @@ const SpecifyRequirements = () => {
                                   disabled={
                                     requirements.goal.length < 1 ||
                                     requirements.goalType.verb.length < 1
-                                  }
+                                 }
                                 >
                                   <DoneIcon />
                                 </IconButton>
+                              </Tooltip> */}
+                              <style>
+                              {`
+                              @keyframes checkmark-bounce {
+                                0% { transform: scale(1);}
+                                30% { transform: scale(1.18);}
+                                60% { transform: scale(0.95);}
+                                100% { transform: scale(1.15);}
+                              }
+                              .custom-checkmark-btn {
+                                background-color: #1976d2 !important;
+                                color: #fff !important;
+                                transition: background 0.2s, color 0.2s;
+                              }
+                              .custom-checkmark-btn:hover:not(:disabled) {
+                                background-color: #fff !important;
+                                color: #1976d2 !important;
+                                border: 1.5px solid #1976d2 !important;
+                              }
+                              `}
+                              </style>
+                              <Tooltip
+                                title={state.showGoalCheckmarkTip ? "Confirm" : "Confirm"}
+                                open={state.showGoalCheckmarkTip || undefined}
+                                placement="top"
+                                arrow
+                              >
+                                <span>
+                                  <IconButton
+                                    className={
+                                      requirements.goal.length > 0 &&
+                                      requirements.goalType.verb.length > 0 &&
+                                      requirements.edit.goal
+                                        ? 'custom-checkmark-btn'
+                                        : ''
+                                    }
+                                    onClick={handleToggleGoalEdit}
+                                    disabled={
+                                      requirements.goal.length < 1 ||
+                                      requirements.goalType.verb.length < 1
+                                    }
+                                    sx={
+                                      requirements.goal.length > 0 &&
+                                      requirements.goalType.verb.length > 0 &&
+                                      requirements.edit.goal
+                                        ? {
+                                            animation: 'checkmark-bounce 0.7s',
+                                            transform: 'scale(1.15)',
+                                            boxShadow: '0 0 8px #1976d2',
+                                          }
+                                        : undefined
+                                    }
+                                  >
+                                    <DoneIcon />
+                                  </IconButton>
+                                </span>
                               </Tooltip>
                             </Grid>
                           </Grid>
@@ -440,13 +532,28 @@ const SpecifyRequirements = () => {
                             </Grid>
                             <Grid item>
                               <Tooltip title="Confirm">
-                                <IconButton
-                                  color="primary"
-                                  onClick={handleToggleQuestionEdit}
-                                  disabled={requirements.question.length < 1}
-                                >
-                                  <DoneIcon />
-                                </IconButton>
+                                <span>
+                                  <IconButton
+                                    className={
+                                      requirements.question.length > 0 && requirements.edit.question
+                                        ? 'custom-checkmark-btn'
+                                        : ''
+                                    }
+                                    onClick={handleToggleQuestionEdit}
+                                    disabled={requirements.question.length < 1}
+                                    sx={
+                                      requirements.question.length > 0 && requirements.edit.question
+                                        ? {
+                                            animation: 'checkmark-bounce 0.7s',
+                                            transform: 'scale(1.15)',
+                                            boxShadow: '0 0 8px #1976d2',
+                                          }
+                                        : undefined
+                                    }
+                                  >
+                                    <DoneIcon />
+                                  </IconButton>
+                                </span>
                               </Tooltip>
                             </Grid>
                           </Grid>
