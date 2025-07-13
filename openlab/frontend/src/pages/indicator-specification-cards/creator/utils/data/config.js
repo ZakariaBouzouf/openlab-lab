@@ -46,7 +46,7 @@ const DataTypes = {
   },
   catOrdered: {
     value: "Categorical (ordinal)",
-    type: "string",
+    type: "catOrdered",
     description:
       "Groups information into categories that have a specific order. For example, temperature can be categorized as low, medium, or high.",
   },

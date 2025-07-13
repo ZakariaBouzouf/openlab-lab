@@ -147,8 +147,14 @@ const DataTableManager = () => {
     state.page * state.pageSize,
   );
 
+  const dataTypeLabel = {
+      string: "Categorical",
+      number: "Numerical",
+      catOrdered: "Categorical (ordinal)",
+  };
+
   const columnTypeLabel = dataset.columns.map((col) => {
-    const headerLabel = col.type === "string" ? "Categorical" : "Numerical";
+    const headerLabel = dataTypeLabel[col.type] || "No Column Type Selected";
     const isNumber = col.type === "number";
     return {
       ...col,

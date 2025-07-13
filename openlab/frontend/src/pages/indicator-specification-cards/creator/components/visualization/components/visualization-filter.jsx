@@ -20,6 +20,7 @@ import { Recommend } from "@mui/icons-material";
 
 const VisualizationFilter = () => {
   const { dataset, visRef, setVisRef } = useContext(ISCContext);
+  const [warning, setWarning] = React.useState("");
   const [state, setState] = React.useState({
     openFilters: false,
     visualizationList: [],
@@ -85,7 +86,7 @@ const VisualizationFilter = () => {
     return false;
   };
 
-  const checkVisualizationRecommendation = (visualization, columnTypes) => {
+  const getColumnTypeCounts = (visualization, columnTypes) => {
     // Count the total required columns for each type
     let requiredCategorical = 0;
     let requiredNumerical = 0;
@@ -108,15 +109,86 @@ const VisualizationFilter = () => {
     const availableNumbers = columnTypes.filter(
       (type) => type === "number"
     ).length;
+    const availableCatOrdered = columnTypes.filter(
+      (type) => type === "catOrdered"
+    ).length;
 
-    // Check if the dataset meets the visualization requirements
-    const hasRequiredStrings =
-      availableStrings >= requiredCategorical + requiredCatOrdered;
-    const hasRequiredNumbers = availableNumbers >= requiredNumerical;
-
-    return hasRequiredStrings && hasRequiredNumbers;
+    return {
+      requiredCategorical,
+      requiredNumerical,
+      requiredCatOrdered,
+      availableStrings,
+      availableNumbers,
+      availableCatOrdered,
+    };
   };
 
+  const checkVisualizationRecommendation = (visualization, columnTypes) => {
+    const {
+      requiredCategorical,
+      requiredNumerical,
+      requiredCatOrdered,
+      availableStrings,
+      availableNumbers,
+      availableCatOrdered,
+    } = getColumnTypeCounts(visualization, columnTypes);
+
+    const hasCategorical = availableStrings >= requiredCategorical;
+    const hasNumerical = availableNumbers >= requiredNumerical;
+    const hasCatOrdered = availableCatOrdered >= requiredCatOrdered;
+
+    return hasCategorical && hasNumerical && hasCatOrdered;
+  };
+
+  // Missing data types
+  const getMissingDataTypes = (visualization, columnTypes) => {
+    const {
+      requiredCategorical,
+      requiredNumerical,
+      requiredCatOrdered,
+      availableStrings,
+      availableNumbers, 
+      availableCatOrdered,
+    } = getColumnTypeCounts(visualization, columnTypes);
+
+    const missing = [];
+
+    if (availableStrings < requiredCategorical) {
+      const count = requiredCategorical - availableStrings;
+      missing.push(`${count} categorical column${count > 1 ? "s" : ""}`);
+    }
+
+    if (availableCatOrdered < requiredCatOrdered) {
+      const count = requiredCatOrdered - availableCatOrdered;
+      missing.push(`${count} ordinal column${count > 1 ? "s" : ""}`);
+    }
+
+    if (availableNumbers < requiredNumerical) {
+      const count = requiredNumerical - availableNumbers;
+      missing.push(`${count} numerical column${count > 1 ? "s" : ""}`);
+    }
+
+    return missing;
+  };
+
+   // Warning for missing data types
+  const onChartClick = (visualization) => {
+    handleSelectVisualization(visualization);
+    const meetsRequirements = checkVisualizationRecommendation(visualization, columnTypes);
+    if (!meetsRequirements) {
+      const missing = getMissingDataTypes(visualization, columnTypes);
+      setWarning(`Missing data: Please add ${missing.join(" and ")} to your dataset.`);
+    } else {
+      setWarning("");
+    }
+  };
+  
+  const handleToggleShowDescription = () => {
+    setState((prevState) => ({
+      ...prevState,
+      showDescription: !prevState.showDescription,
+    }));
+  };
 
   return (
     <>
@@ -152,7 +224,7 @@ const VisualizationFilter = () => {
                           md={2}
                           sx={{ cursor: "pointer" }}
                           onClick={() =>
-                            handleSelectVisualization(visualization)
+                            onChartClick(visualization)
                           }
                         >
                           <Grid container spacing={2}>
@@ -223,6 +295,17 @@ const VisualizationFilter = () => {
                                 </Grid>
                               </Grid>
                             </Grid>
+                            {visRef.chart.type === visualization.type && warning && (
+                              <Grid item xs={12}>
+                                <Typography
+                                  variant="body2"
+                                  color="error"
+                                  sx={{ mt: 1, textAlign: "center" }}
+                                >
+                                  {warning}
+                                </Typography>
+                              </Grid>
+                            )}
                           </Grid>
                         </Grid>
                       );
