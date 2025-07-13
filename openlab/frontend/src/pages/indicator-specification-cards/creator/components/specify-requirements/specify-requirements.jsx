@@ -361,26 +361,6 @@ const SpecifyRequirements = () => {
                         <Grid item xs sm={4}>
                           <GoalList addButtonClassName="goallist-add-btn" />
                         </Grid>
-      <style>
-      {`
-        .goallist-add-btn {
-          background-color: #1976d2 !important;
-          color: #fff !important;
-          border-radius: 8px !important;
-          font-size: 1.1rem !important;
-          font-weight: 500 !important;
-          box-shadow: none !important;
-          padding: 8px 24px !important;
-          margin-top: 8px !important;
-          margin-bottom: 8px !important;
-          transition: background 0.2s, color 0.2s;
-        }
-        .goallist-add-btn:hover:not(:disabled) {
-          background-color: #1565c0 !important;
-          color: #fff !important;
-        }
-      `}
-      </style>
                         <Grid item xs={12} sm>
                           <Grid container spacing={2} alignItems="center">
                             <Grid item xs>
@@ -395,18 +375,7 @@ const SpecifyRequirements = () => {
                               />
                             </Grid>
                             <Grid item>
-                              <Tooltip title="Confirm">
-                                <IconButton
-                                  color="primary"
-                                  onClick={handleToggleGoalEdit}
-                                  disabled={
-                                    requirements.goal.length < 1 ||
-                                    requirements.goalType.verb.length < 1
-                                 }
-                                >
-                                  <DoneIcon />
-                                </IconButton>
-                              </Tooltip> */}
+                            
                               <style>
                               {`
                               @keyframes checkmark-bounce {
