@@ -7,6 +7,7 @@ import Visualization from "./components/visualization/visualization.jsx";
 import Dataset from "./components/dataset/dataset.jsx";
 import Finalize from "./components/finalize/finalize.jsx";
 import { useSnackbar } from "notistack";
+import Method from "./components/method/method.jsx";
 
 export const ISCContext = createContext(undefined);
 
@@ -41,6 +42,7 @@ const IndicatorSpecificationCard = () => {
             { value: "", placeholder: "e.g., number of downloads", type: {} },
           ],
           selectedPath: "",
+          selectedMethod: "",
           edit: {
             goal: true,
             question: true,
@@ -59,7 +61,7 @@ const IndicatorSpecificationCard = () => {
     return savedState
       ? JSON.parse(savedState).dataset
       : {
-          file: { name: "" },
+          file: { name: "",uploaded: false },
           rows: [],
           columns: [],
         };
@@ -124,7 +126,21 @@ const IndicatorSpecificationCard = () => {
           finalize: {
             locked: true,
             openPanel: false,
-            step: "5",
+            step: "6",
+          },
+          method:{
+            locked: true,
+            type:"",
+            openPanel: false,
+            step:"0"
+          },
+          manual:{
+            locked:true,
+            openPanel: false,
+          },
+          upload:{
+            locked:true,
+            openPanel: false,
           },
         };
   });
@@ -208,15 +224,27 @@ const IndicatorSpecificationCard = () => {
           )}
           {lockedStep.dataset.step === "4" && (
             <Grid size={{ xs: 12 }}>
-              <Dataset />
+              <Dataset/>
             </Grid>
           )}
+          {/* Adding the new step "Method" */}
+          {lockedStep.dataset.step === '4' && lockedStep.method.type !== ""  &&(
+            <Grid size={{ xs: 12 }}>
+              <Method />
+            </Grid>
+          )}
+
           {lockedStep.dataset.step === "3" && (
             <Grid size={{ xs: 12 }}>
               <Dataset />
             </Grid>
           )}
-          {lockedStep.visualization.step === "4" && (
+          {lockedStep.dataset.step === '3' && lockedStep.method.type !== ""  &&(
+            <Grid size={{ xs: 12 }}>
+              <Method />
+            </Grid>
+          )}
+          {lockedStep.visualization.step === "5" && (
             <Grid size={{ xs: 12 }}>
               <Visualization />
             </Grid>

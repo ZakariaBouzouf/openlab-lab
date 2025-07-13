@@ -1,31 +1,108 @@
 import React, { useContext, useState } from "react";
-import { ISCContext } from "../../indicator-specification-card.jsx";
 import {
   Accordion,
-  AccordionActions,
   AccordionDetails,
   AccordionSummary,
-  Button,
   Chip,
-  Grid,
   Grow,
   IconButton,
+  Paper,
   Tooltip,
   Typography,
 } from "@mui/material";
+import Grid from "@mui/material/Grid2"
+import { ISCContext } from "../../indicator-specification-card.jsx";
+import { blue, orange } from "@mui/material/colors";
 import LockIcon from "@mui/icons-material/Lock";
-import DataTableManager from "./data-table-manager/data-table-manager.jsx";
-import DataTable from "./components/data-table.jsx";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 
 const Dataset = () => {
-  const { dataset, lockedStep, setLockedStep } = useContext(ISCContext);
+  const { requirements, setRequirements, lockedStep, setLockedStep,dataset } =
+    useContext(ISCContext);
   const [state, setState] = useState({
     showSelections: true,
   });
+
+  const handleChooseManualPath = () => {
+    let vis = "Manual";
+    handleTogglePanel();
+    if (requirements.selectedMethod !== vis) {
+      setLockedStep((prevState) => ({
+        ...prevState,
+        manual: {
+          ...prevState.manual,
+          locked: false,
+          openPanel: true,
+        },
+        upload: {
+          ...prevState.upload,
+          locked: true,
+          openedPanel: false,
+        },
+        method:{
+          ...prevState.method,
+          type: vis,
+          locked:false,
+          openPanel: true,
+          step:prevState?.dataset.step =="3"?"4":"5",
+        }
+      }));
+      setRequirements((prevState) => ({
+        ...prevState,
+        selectedMethod: vis,
+      }));
+    } else {
+      setLockedStep((prevState) => ({
+        ...prevState,
+        manual: {
+          ...prevState.manual,
+          openedPanel: true,
+        },
+      }));
+    }
+  };
+
+  const handleChooseUploadPath = () => {
+    let vis = "Upload";
+    handleTogglePanel();
+    if (requirements.selectedMethod !== vis) {
+      setLockedStep((prevState) => ({
+        ...prevState,
+        manual: {
+          ...prevState.manual,
+          locked: true,
+          openPanel: false,
+        },
+        upload: {
+          ...prevState.upload,
+          locked: false,
+          openedPanel: true,
+        },
+          method:{
+          ...prevState.method,
+          type: vis,
+          locked:false,
+          openPanel: true,
+          step:"5",
+        }
+      }));
+      setRequirements((prevState) => ({
+        ...prevState,
+        selectedMethod: vis,
+      }));
+    } else {
+      setLockedStep((prevState) => ({
+        ...prevState,
+        upload: {
+          ...prevState.upload,
+          openedPanel: true,
+        },
+      }));
+    }
+  }
 
   const handleTogglePanel = () => {
     setLockedStep((prevState) => ({
@@ -44,29 +121,23 @@ const Dataset = () => {
     }));
   };
 
-  const handleUnlockVisualization = () => {
-    handleTogglePanel();
-    setLockedStep((prevState) => ({
-      ...prevState,
-      visualization: {
-        ...prevState.visualization,
-        locked: false,
-        openPanel: true,
-        step: "4",
+  const buttonStyle = (type = "visualization") => {
+    return {
+      height: 150,
+      width: 150,
+      border: "3px solid",
+      borderColor: type === "dataset" ? blue[200] : orange[200],
+      "&:hover": {
+        boxShadow: 5,
+        borderColor: type === "dataset" ? blue[900] : orange[800],
       },
-    }));
-  };
-
-  const handleUnlockFinalize = () => {
-    handleTogglePanel();
-    setLockedStep((prevState) => ({
-      ...prevState,
-      finalize: {
-        ...prevState.finalize,
-        locked: false,
-        openPanel: true,
-      },
-    }));
+      p: 2,
+      borderRadius: 2,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      cursor: "pointer",
+    };
   };
 
   return (
@@ -101,7 +172,7 @@ const Dataset = () => {
                     {!lockedStep.dataset.openPanel && (
                       <>
                         <Grid item>
-                          <Tooltip title="Edit dataset">
+                          <Tooltip title="Edit method">
                             <IconButton onClick={handleTogglePanel}>
                               <EditIcon color="primary" />
                             </IconButton>
@@ -141,56 +212,60 @@ const Dataset = () => {
               </Grid>
             </Grid>
             <Grow
-              in={
-                !lockedStep.dataset.locked &&
-                !lockedStep.dataset.openPanel &&
-                state.showSelections
-              }
+              in={!lockedStep.dataset.openPanel && state.showSelections}
               timeout={{ enter: 500, exit: 0 }}
               unmountOnExit
             >
-              {dataset.columns.length > 0 && (
-                <Grid item xs={12}>
-                  <DataTable rows={dataset.rows} columns={dataset.columns} />
-                </Grid>
-              )}
+              <Grid item xs={12}>
+                {requirements.selectedPath !== "" && (
+                  <Grid item xs={12} spacing={4}>
+                    <Grid container alignItems="center" spacing={1}>
+                      <Grid item>
+                        <Typography>Selected path:</Typography>
+                      </Grid>
+                      <Grid item>
+                        <Chip label={requirements.selectedPath} />
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                )}
+              </Grid>
             </Grow>
           </Grid>
         </AccordionSummary>
-        <AccordionDetails>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <DataTableManager />
+
+        {(<AccordionDetails>
+          <Grid container justifyContent="center" spacing={4} sx={{ py: 2 }}>
+            <Grid item>
+              <Paper
+                elevation={0}
+                sx={buttonStyle()}
+                onClick={handleChooseManualPath}
+              >
+                <Typography variant="h6" align="center">
+                  Create you own data set 
+                </Typography>
+              </Paper>
+            </Grid>
+
+            <Grid item>
+              <Paper
+                elevation={0}
+                sx={buttonStyle("dataset")}
+                onClick={handleChooseUploadPath}
+              >
+                <Typography variant="h6" align="center">
+                  Upload a CSV
+                </Typography>
+              </Paper>
             </Grid>
           </Grid>
-        </AccordionDetails>
-        <AccordionActions sx={{ py: 2 }}>
-          <Grid item xs={12}>
-            <Grid container spacing={2} justifyContent="center">
-              <Grid item xs={12} md={6}>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  disabled={
-                    dataset.rows.length === 0 && dataset.columns.length === 0
-                  }
-                  onClick={
-                    lockedStep.dataset.step === "3"
-                      ? handleUnlockVisualization
-                      : lockedStep.dataset.step === "4"
-                      ? handleUnlockFinalize
-                      : undefined
-                  }
-                >
-                  Next
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
-        </AccordionActions>
+        </AccordionDetails>)}
+
       </Accordion>
     </>
   );
 };
 
 export default Dataset;
+

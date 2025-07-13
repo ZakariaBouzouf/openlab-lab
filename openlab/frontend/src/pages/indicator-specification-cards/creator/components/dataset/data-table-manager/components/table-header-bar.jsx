@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import {
   Button,
   ButtonGroup,
-  Grid,
   IconButton,
   Tooltip,
   Typography,
 } from "@mui/material";
+import Grid from "@mui/material/Grid2"
 import { Add as AddIcon, MoreVert as MoreVertIcon } from "@mui/icons-material";
 import ImportDialog from "../../components/import-dialog.jsx";
 import TableMenu from "./table-menu.jsx";
@@ -43,7 +43,7 @@ const TableHeaderBar = () => {
 
   return (
     <>
-      <Grid container spacing={2} justifyContent="center" alignItems="center">
+      <Grid container spacing={2} justifyContent="space-between" alignItems="center">
         <Grid item xs>
           <ButtonGroup variant="contained" disableElevation>
             <Button startIcon={<AddIcon />} onClick={handleOpenAddColumn}>
@@ -54,13 +54,9 @@ const TableHeaderBar = () => {
             </Button>
           </ButtonGroup>
         </Grid>
+
         <Grid item>
           <Grid container spacing={2} alignItems="center">
-            <Grid item>
-              <Button variant="contained" onClick={handleOpenImportDataset}>
-                Upload CSV
-              </Button>
-            </Grid>
             <Grid item>
               <Tooltip
                 arrow

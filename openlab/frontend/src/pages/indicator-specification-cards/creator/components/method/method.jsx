@@ -2,42 +2,55 @@ import React, { useContext, useState } from "react";
 import {
   Accordion,
   AccordionActions,
-  AccordionDetails,
   AccordionSummary,
   Button,
   Chip,
-  Grid,
   Grow,
   IconButton,
   Tooltip,
   Typography,
 } from "@mui/material";
+import Grid from "@mui/material/Grid2"
 import { ISCContext } from "../../indicator-specification-card.jsx";
 import LockIcon from "@mui/icons-material/Lock";
-import ChartTypeFilter from "./components/chart-type-filter.jsx";
-import VisualizationFilter from "./components/visualization-filter.jsx";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
+import DataTableManager from "../dataset/data-table-manager/data-table-manager.jsx";
+import ImportDialog from "../dataset/components/import-dialog.jsx";
+import DataTable from "../dataset/components/data-table.jsx"
 
-const Visualization = () => {
-  const {
-    requirements,
-    lockedStep,
-    setLockedStep,
-    visRef,
-  } = useContext(ISCContext);
+const Method = () =>{
+  const { requirements, lockedStep, setLockedStep,dataset ,setDataset} =
+    useContext(ISCContext);
   const [state, setState] = useState({
     showSelections: true,
   });
 
+  const handleOpenImportDataset = () => {
+    setState((prevState) => ({
+      ...prevState,
+      openCsvImport: !prevState.openCsvImport,
+    }));
+  };
+
+  const handleImportingFile = () => {
+    setDataset((prevState) => ({
+      ...prevState,
+      file:{
+        ...prevState.file,
+        uploaded : true
+      }
+    }));
+  };
+
   const handleTogglePanel = () => {
     setLockedStep((prevState) => ({
       ...prevState,
-      visualization: {
-        ...prevState.visualization,
-        openPanel: !prevState.visualization.openPanel,
+      method: {
+        ...prevState.method,
+        openPanel: !prevState.method.openPanel,
       },
     }));
   };
@@ -49,15 +62,15 @@ const Visualization = () => {
     }));
   };
 
-  const handleUnlockDataset = () => {
+  const handleUnlockVisualization = () => {
     handleTogglePanel();
     setLockedStep((prevState) => ({
       ...prevState,
-      dataset: {
-        ...prevState.dataset,
+      visualization: {
+        ...prevState.visualization,
         locked: false,
         openPanel: true,
-        step: "4",
+        step: "5",
       },
     }));
   };
@@ -77,8 +90,8 @@ const Visualization = () => {
   return (
     <>
       <Accordion
-        expanded={lockedStep.visualization.openPanel}
-        disabled={lockedStep.visualization.locked}
+        expanded={lockedStep.method.openPanel}
+        disabled={lockedStep.method.locked}
       >
         <AccordionSummary>
           <Grid container spacing={1}>
@@ -92,11 +105,8 @@ const Visualization = () => {
                 <Grid item xs>
                   <Grid container alignItems="center" spacing={1}>
                     <Grid item>
-                      {!lockedStep.visualization.locked ? (
-                        <Chip
-                          label={lockedStep.visualization.step}
-                          color="primary"
-                        />
+                      {!lockedStep.method.locked ? (
+                        <Chip label={lockedStep.method.step} color="primary" />
                       ) : (
                         <IconButton size="small">
                           <LockIcon />
@@ -104,12 +114,13 @@ const Visualization = () => {
                       )}
                     </Grid>
                     <Grid item>
-                      <Typography>Visualization</Typography>
+                      <Typography>Method</Typography>
                     </Grid>
-                    {!lockedStep.visualization.openPanel && (
+
+                    {!lockedStep.method.openPanel && (
                       <>
                         <Grid item>
-                          <Tooltip title="Edit visualization selection">
+                          <Tooltip title="Edit method">
                             <IconButton onClick={handleTogglePanel}>
                               <EditIcon color="primary" />
                             </IconButton>
@@ -137,7 +148,7 @@ const Visualization = () => {
                     )}
                   </Grid>
                 </Grid>
-                {lockedStep.visualization.openPanel && (
+                {lockedStep.method.openPanel && (
                   <Grid item>
                     <Tooltip title="Close panel">
                       <IconButton onClick={handleTogglePanel}>
@@ -149,56 +160,60 @@ const Visualization = () => {
               </Grid>
             </Grid>
             <Grow
-              in={
-                !lockedStep.visualization.locked &&
-                !lockedStep.visualization.openPanel &&
-                state.showSelections
-              }
+              in={!lockedStep.method.openPanel && state.showSelections}
               timeout={{ enter: 500, exit: 0 }}
               unmountOnExit
             >
               <Grid item xs={12}>
-                <Grid container spacing={1}>
-                  {visRef.filter.type !== "" &&
-                    requirements.goalType.name !== "" && (
-                      <Grid item xs={12}>
-                        <Grid container alignItems="center" spacing={1}>
-                          <Grid item>
-                            <Typography>Filter applied</Typography>
-                          </Grid>
-                          <Grid item>
-                            <Chip label={visRef.filter.type} />
-                          </Grid>
+                {requirements.selectedPath !== "" && (
+                  <Grid item xs={12} spacing={4}>
+                    {requirements.selectedMethod !== "" && (
+                      <Grid container alignItems="center" spacing={1}>
+                        <Grid item>
+                          <Typography>Selected method:</Typography>
+                        </Grid>
+                        <Grid item>
+                          <Chip label={requirements.selectedMethod} />
                         </Grid>
                       </Grid>
                     )}
-                  {visRef.chart.type !== "" && (
-                    <Grid item xs={12}>
-                      <Grid container alignItems="center" spacing={1}>
-                        <Grid item>
-                          <Typography>Chart selected</Typography>
-                        </Grid>
-                        <Grid item>
-                          <Chip label={visRef.chart.type} />
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                  )}
-                </Grid>
+                  </Grid>
+                )}
               </Grid>
             </Grow>
           </Grid>
         </AccordionSummary>
-        <AccordionDetails>
-          <Grid container spacing={2}>
+
+        <Grid item spacing={2} sx={{ pl: 1 }}>
+          {lockedStep.method.type == "Manual" && (
             <Grid item xs={12}>
-              <ChartTypeFilter />
+              <DataTableManager />
             </Grid>
+          )}
+          {lockedStep.method.type == "Upload" && (
             <Grid item xs={12}>
-              <VisualizationFilter />
+              <Grid container sx={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}>
+                <Button variant="contained" onClick={handleOpenImportDataset}>
+                  Upload CSV
+                </Button>
+              </Grid >
+              <ImportDialog
+                open={state.openCsvImport}
+                toggleOpen={handleOpenImportDataset}
+                importingFile={handleImportingFile}
+              />
+              {dataset.file.uploaded && (
+                <Grid sx={{ py: 2 }}>
+                  <DataTable rows={dataset.rows} columns={dataset.columns} />
+                </Grid>
+              )}
             </Grid>
-          </Grid>
-        </AccordionDetails>
+          )}
+        </Grid>
+
         <AccordionActions sx={{ py: 2 }}>
           <Grid item xs={12}>
             <Grid container spacing={2} justifyContent="center">
@@ -206,13 +221,15 @@ const Visualization = () => {
                 <Button
                   fullWidth
                   variant="contained"
-                  disabled={visRef.chart.type === ""}
+                  disabled={
+                    dataset.rows.length === 0 && dataset.columns.length === 0
+                  }
                   onClick={
-                    lockedStep.visualization.step === "3"
-                      ? handleUnlockDataset
-                      : lockedStep.visualization.step === "5"
-                      ? handleUnlockFinalize
-                      : undefined
+                    lockedStep.dataset.step === "3"
+                      ? handleUnlockVisualization
+                      : lockedStep.dataset.step === "4"
+                        ? handleUnlockFinalize
+                        : undefined
                   }
                 >
                   Next
@@ -224,6 +241,7 @@ const Visualization = () => {
       </Accordion>
     </>
   );
-};
+}
 
-export default Visualization;
+
+export default Method;
