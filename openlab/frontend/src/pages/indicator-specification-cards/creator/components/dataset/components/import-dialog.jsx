@@ -127,20 +127,6 @@ const ImportDialog = ({ open, toggleOpen,importingFile }) => {
             variant="contained"
             color="primary"
             startIcon={<GetAppIcon />}
-            sx={{
-              backgroundColor: '#e0e0e0 !important',
-              color: '#9e9e9e !important',
-              pointerEvents: 'none !important',
-              boxShadow: 'none !important',
-              border: 'none !important',
-               '&.Mui-disabled': {
-               backgroundColor: '#e0e0e0 !important',
-               color: '#9e9e9e !important',
-               pointerEvents: 'none !important',
-               boxShadow: 'none !important',
-              border: 'none !important',
-              },
-            }}
           >
             Import data
           </Button>
