@@ -188,18 +188,6 @@ const SpecifyRequirements = () => {
 
   return (
     <>
-      <div style={{ marginBottom: 6 }}>
-        <Tooltip title="Back to ISCs List" placement="right">
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => navigate("/isc")}
-            startIcon={<ArrowBackIcon />}
-          >
-            {/* Kein Text, nur Icon */}
-          </Button>
-        </Tooltip>
-      </div>
       <Accordion expanded={lockedStep.requirements.openPanel}>
         <AccordionSummary>
           <Grid container spacing={1}>
