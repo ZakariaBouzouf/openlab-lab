@@ -14,9 +14,8 @@ import {
 import { ISCContext } from "../../../indicator-specification-card.jsx";
 import { Alert } from "@mui/lab";
 
-const CsvImporter = () => { //Modification-1 part-6 can use setfileError to set error
+const CsvImporter = ({ fileError, setFileError }) => { //Modification-1 part-6 can use setfileError to set error
   const { dataset, setDataset } = useContext(ISCContext);
-  const [fileError, setFileError] = useState("");//state for tracking file format error message
   const handleImportFile = (event) => {
   const selectedFile = event.target.files[0];
   if (!selectedFile) return;
