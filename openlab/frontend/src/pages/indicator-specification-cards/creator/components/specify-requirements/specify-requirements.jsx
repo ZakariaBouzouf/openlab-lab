@@ -52,6 +52,12 @@ const SpecifyRequirements = () => {
     }
   },[permissionToChange])
 
+  // Automatically refresh the dataset when requirements.data changes (recommendation charts will automatically refresh with changes in dataset.columns)
+  useEffect(() => {
+    addNewColumnsMethod();
+    // ...existing code...
+  }, [requirements.data]);
+
 
   // pop up prompt after user stops typing for a while
   React.useEffect(() => {
