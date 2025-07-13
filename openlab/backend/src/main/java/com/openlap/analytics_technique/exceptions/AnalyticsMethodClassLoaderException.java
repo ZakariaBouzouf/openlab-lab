@@ -8,7 +8,7 @@ public class AnalyticsMethodClassLoaderException extends RuntimeException {
     super(message);
     log.error(message);
   }
-  
+
   public AnalyticsMethodClassLoaderException(String message, Throwable cause) {
     super(message, cause);
     log.error(message, cause);
