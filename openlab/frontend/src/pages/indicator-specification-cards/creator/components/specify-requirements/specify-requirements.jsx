@@ -523,7 +523,28 @@ const SpecifyRequirements = () => {
                                 onChange={handleFormData}
                               />
                             </Grid>
+
                             <Grid item>
+                              <style>
+                              {`
+                              @keyframes checkmark-bounce {
+                                0% { transform: scale(1);}
+                                30% { transform: scale(1.18);}
+                                60% { transform: scale(0.95);}
+                                100% { transform: scale(1.15);}
+                              }
+                              .custom-checkmark-btn {
+                                background-color: #1976d2 !important;
+                                color: #fff !important;
+                                transition: background 0.2s, color 0.2s;
+                              }
+                              .custom-checkmark-btn:hover:not(:disabled) {
+                                background-color: #fff !important;
+                                color: #1976d2 !important;
+                                border: 1.5px solid #1976d2 !important;
+                              }
+                              `}
+                              </style>
                               <Tooltip title="Confirm">
                                 <span>
                                   <IconButton
