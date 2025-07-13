@@ -17,7 +17,6 @@ import { DataTypes } from "../../../utils/data/config.js";
 
 const ImportDialog = ({ open, toggleOpen,importingFile }) => {
   const { dataset, setDataset } = useContext(ISCContext);
-
   const [fileError, setFileError] = React.useState("");//Modification-1 part 4 (1 row)
   const handleUploadFile = () => {
     const reader = new FileReader();
@@ -121,13 +120,27 @@ const ImportDialog = ({ open, toggleOpen,importingFile }) => {
             Cancel
           </Button>
           <Button
-            onClick={handleUploadFile}
-            disabled={!dataset.file.name || !!fileError} //Modification-1 part-7 add Judgement:if fileError exists, then disable the button
+            onClick={(!dataset.file.name || !!fileError) ? undefined : handleUploadFile}
+            disabled={!dataset.file.name || !!fileError}
             autoFocus
             fullWidth
             variant="contained"
             color="primary"
             startIcon={<GetAppIcon />}
+            sx={{
+              backgroundColor: '#e0e0e0 !important',
+              color: '#9e9e9e !important',
+              pointerEvents: 'none !important',
+              boxShadow: 'none !important',
+              border: 'none !important',
+               '&.Mui-disabled': {
+               backgroundColor: '#e0e0e0 !important',
+               color: '#9e9e9e !important',
+               pointerEvents: 'none !important',
+               boxShadow: 'none !important',
+              border: 'none !important',
+              },
+            }}
           >
             Import data
           </Button>
