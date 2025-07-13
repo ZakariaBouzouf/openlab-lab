@@ -24,7 +24,6 @@ const VisualizationFilter = () => {
     openFilters: false,
     visualizationList: [],
     recommendation: false,
-    showDescription: false,
   });
 
   const handleSelectVisualization = (chart) => {
@@ -44,6 +43,8 @@ const VisualizationFilter = () => {
         },
       }));
     }
+    // Display the description directly after selecting the chart
+    // ...existing code...
   };
 
   useEffect(() => {
@@ -116,12 +117,6 @@ const VisualizationFilter = () => {
     return hasRequiredStrings && hasRequiredNumbers;
   };
 
-  const handleToggleShowDescription = () => {
-    setState((prevState) => ({
-      ...prevState,
-      showDescription: !prevState.showDescription,
-    }));
-  };
 
   return (
     <>
@@ -255,35 +250,14 @@ const VisualizationFilter = () => {
               </Grid>
             </Grid>
             <Grid item xs={12}>
-              {/* // TODO: Complete the show and hide description button for the Visualization module */}
               {Boolean(visRef.chart.type) && (
                 <>
-                  {!state.showDescription && (
-                    <Grid container justifyContent="flex-end">
-                      <Button
-                        variant="contained"
-                        onClick={handleToggleShowDescription}
-                      >
-                        Show description
-                      </Button>
-                    </Grid>
-                  )}
-                  <Grow
-                    in={state.showDescription}
-                    timeout={{ enter: 500, exit: 0 }}
-                    unmountOnExit
-                  >
-                    <div>
-                      <Grid item xs={12}>
-                        <Divider />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <VisualizationDescription
-                          toggleDescription={handleToggleShowDescription}
-                        />
-                      </Grid>
-                    </div>
-                  </Grow>
+                  <Grid item xs={12}>
+                    <Divider />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <VisualizationDescription />
+                  </Grid>
                 </>
               )}
             </Grid>
