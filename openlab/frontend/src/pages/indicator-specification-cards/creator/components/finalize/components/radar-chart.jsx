@@ -359,12 +359,16 @@ const RadarChart = ({ customize = false, handleToggleCustomizePanel }) => {
   // Determine the label to show based on the column type
   const xAxisColumnType = selectedXAxisColumn
     ? (selectedXAxisColumn.type === "string" ? "Categorical" : "Numerical")
-    : "Unknown"; // optional fallback if no column is selecte
+    : "No Data"; // optional fallback if no column is selecte
 
   // If multiple data selected
   const selectedYAxesColumns = (state.axisOptions.selectedYAxis || []).map((field) => {
   const col = state.axisOptions.yAxisOptions.find((c) => c.field === field);
-    return col?.type === "string" ? "Categorical" : "Numerical";
+    return col
+    ? col.type === "string"
+      ? "Categorical"
+      : "Numerical"
+    : "No Data";
   });
 
   const yAxesColumnTypes = [...new Set(selectedYAxesColumns)].join(", "); // remove duplicates
@@ -393,6 +397,12 @@ const RadarChart = ({ customize = false, handleToggleCustomizePanel }) => {
               ))}
             </Select>
           </FormControl>
+          {/* Warning for X-Axis */}
+            {xAxisColumnType === "No Data" && (
+              <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                Missing categorical data
+              </Typography>
+          )}
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth>
@@ -424,6 +434,12 @@ const RadarChart = ({ customize = false, handleToggleCustomizePanel }) => {
             </Select>
             <FormHelperText>Multi-select possible</FormHelperText>
           </FormControl>
+          {/* Warning for Y-Axis */}
+          {yAxesColumnTypes === "No Data" && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              Missing numerical data
+            </Typography>
+          )}
         </Grid>
         {!customize && (
           <Grid size={{ xs: 12 }}>

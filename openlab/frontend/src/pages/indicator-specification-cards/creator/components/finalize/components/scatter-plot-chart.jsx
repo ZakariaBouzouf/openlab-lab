@@ -434,15 +434,15 @@ const ScatterPlotChart = ({
   // Determine the label to show based on the column type
   const xAxisColumnType = selectedXAxisColumn
     ? (selectedXAxisColumn.type === "string" ? "Categorical" : "Numerical")
-    : "Unknown"; // optional fallback if no column is selecte
+    : "No Data"; // optional fallback if no column is selecte
 
   const yAxisColumnType = selectedYAxisColumn
     ? (selectedYAxisColumn.type === "string" ? "Categorical" : "Numerical")
-    : "Unknown"; // optional fallback if no column is selected
+    : "No Data"; // optional fallback if no column is selected
 
   const labelColumnType = selectedLabelColumn
     ? (selectedLabelColumn.type === "string" ? "Categorical" : "Numerical")
-    : "Unknown"; // optional fallback if no column is selected
+    : "No Data"; // optional fallback if no column is selected
 
   const xAxisLabel = `X-Axis (${xAxisColumnType})`;
   const yAxisLabel = `Y-Axis (${yAxisColumnType})`;
@@ -469,6 +469,12 @@ const ScatterPlotChart = ({
               ))}
             </Select>
           </FormControl>
+          {/* Warning for X-Axis */}
+          {xAxisColumnType === "No Data" && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              Missing numerical data
+            </Typography>
+          )}
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
@@ -488,6 +494,12 @@ const ScatterPlotChart = ({
               ))}
             </Select>
           </FormControl>
+          {/* Warning for Y-Axis */}
+          {yAxisColumnType === "No Data" && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              Missing numerical data
+            </Typography>
+          )}
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
@@ -507,6 +519,12 @@ const ScatterPlotChart = ({
               ))}
             </Select>
           </FormControl>
+          {/* Warning for Labels */}
+          {labelColumnType === "No Data" && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              Missing categorical data
+            </Typography>
+          )}
         </Grid>
         {!customize && (
           <Grid size={{ xs: 12 }}>

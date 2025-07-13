@@ -387,19 +387,19 @@ const TreeMap = ({ customize = false, handleToggleCustomizePanel }) => {
   );
 
   // Determine the label to show based on the column type
-  const CategoryColumnType = selectedCategoryColumn
+  const categoryColumnType = selectedCategoryColumn
     ? (selectedCategoryColumn.type === "string" ? "Categorical" : "Numerical")
-    : "Unknown"; // optional fallback if no column is selecte
+    : "No Data"; // optional fallback if no column is selecte
 
   const xValueColumnType = selectedXValueColumn
     ? (selectedXValueColumn.type === "string" ? "Categorical" : "Numerical")
-    : "Unknown"; // optional fallback if no column is selected
+    : "No Data"; // optional fallback if no column is selected
 
   const valueColumnType = selectedValueColumn
     ? (selectedValueColumn.type === "string" ? "Categorical" : "Numerical")
-    : "Unknown"; // optional fallback if no column is selected
+    : "No Data"; // optional fallback if no column is selected
 
-  const categoryLabel = `Category (${CategoryColumnType})`;
+  const categoryLabel = `Category (${categoryColumnType})`;
   const xValueLabel = `X-Value (${xValueColumnType})`;
   const valueLabel = `Value (${valueColumnType})`;
 
@@ -424,6 +424,12 @@ const TreeMap = ({ customize = false, handleToggleCustomizePanel }) => {
               ))}
             </Select>
           </FormControl>
+          {/* Warning for Category */}
+          {categoryColumnType === "No Data" && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              Missing categorical data
+            </Typography>
+          )}
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
@@ -443,6 +449,12 @@ const TreeMap = ({ customize = false, handleToggleCustomizePanel }) => {
               ))}
             </Select>
           </FormControl>
+          {/* Warning for X-Value */}
+          {xValueColumnType === "No Data" && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              Missing categorical data
+            </Typography>
+          )}
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
@@ -462,6 +474,12 @@ const TreeMap = ({ customize = false, handleToggleCustomizePanel }) => {
               ))}
             </Select>
           </FormControl>
+          {/* Warning for Value */}
+          {valueColumnType === "No Data" && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              Missing numerical data
+            </Typography>
+          )}
         </Grid>
         {!customize && (
           <Grid size={{ xs: 12 }}>

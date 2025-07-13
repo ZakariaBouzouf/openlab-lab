@@ -322,7 +322,7 @@ const DataTableManager = () => {
   }
 
   const columnTypeLabel = dataset.columns.map((col) => {
-    const headerLabel = col.type === "string" ? "Categorical" : "Numerical";
+    const headerLabel = dataTypeLabel[col.type] || "No Column Type Selected";
     const isNumber = col.type === "number";
     return {
       ...col,
