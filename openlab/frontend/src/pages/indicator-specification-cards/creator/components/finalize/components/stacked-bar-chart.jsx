@@ -450,15 +450,15 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
   // Determine the label to show based on the column type
   const xAxisColumnType = selectedXAxisColumn
     ? (selectedXAxisColumn.type === "string" ? "Categorical" : "Numerical")
-    : "Unknown"; // optional fallback if no column is selecte
+    : "No Data"; // optional fallback if no column is selecte
 
   const yAxisColumnType = selectedYAxisColumn
     ? (selectedYAxisColumn.type === "string" ? "Categorical" : "Numerical")
-    : "Unknown"; // optional fallback if no column is selected
+    : "No Data"; // optional fallback if no column is selected
 
   const stackColumnType = selectedStackColumn
     ? (selectedStackColumn.type === "string" ? "Categorical" : "Numerical")
-    : "Unknown"; // optional fallback if no column is selected
+    : "No Data"; // optional fallback if no column is selected
 
   const xAxisLabel = `X-Axis: Group By (${xAxisColumnType})`;
   const yAxisLabel = `Y-Axis (${yAxisColumnType})`;
@@ -485,6 +485,12 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
               ))}
             </Select>
           </FormControl>
+          {/* Warning for X-Axis */}
+          {xAxisColumnType === "No Data" && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              Missing categorical data
+            </Typography>
+          )}
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
@@ -504,6 +510,12 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
               ))}
             </Select>
           </FormControl>
+          {/* Warning for stackColumnType */}
+          {stackColumnType === "No Data" && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              Missing categorical data
+            </Typography>
+          )}
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
@@ -523,6 +535,12 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
               ))}
             </Select>
           </FormControl>
+          {/* Warning for Y-Axis */}
+          {yAxisColumnType === "No Data" && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              Missing numerical data
+            </Typography>
+          )}
         </Grid>
         {!customize && (
           <Grid size={{ xs: 12 }}>
