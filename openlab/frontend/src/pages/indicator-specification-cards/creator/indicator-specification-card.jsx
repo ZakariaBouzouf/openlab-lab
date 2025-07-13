@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useRef, useState } from "react";
-import { Divider, Typography, Button } from "@mui/material";
+import { Divider, Typography, Button, IconButton } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import SpecifyRequirements from "./components/specify-requirements/specify-requirements.jsx";
 import ChoosePath from "./components/choose-path/choose-path.jsx";
@@ -12,11 +12,15 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import HomeIcon from "@mui/icons-material/Home";
+import { useNavigate } from "react-router-dom";
 
 export const ISCContext = createContext(undefined);
 
 const IndicatorSpecificationCard = () => {
   const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
   const [id, setId] = useState(() => {
     const savedState = sessionStorage.getItem("session_isc");
     return savedState
@@ -250,7 +254,7 @@ const IndicatorSpecificationCard = () => {
       finalize: { locked: true, openPanel: false, step: "5" },
     });
     sessionStorage.removeItem("session_isc");
-    enqueueSnackbar("Alle Angaben wurden zurückgesetzt.", { variant: "success" });
+    enqueueSnackbar("All was reset.", { variant: "success" });
   };
 
   // Neue Handler für Dialog
@@ -290,14 +294,30 @@ const IndicatorSpecificationCard = () => {
       >
         {/* Button und Titel in einer Zeile */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", marginBottom: 16 }}>
-          <Typography>ISC Creator</Typography>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <IconButton
+              color="primary"
+              onClick={() => navigate("/isc")}
+              sx={{ p: 0.5, mr: 1 }}
+            >
+              <HomeIcon />
+            </IconButton>
+            <Typography>ISC Creator</Typography>
+          </div>
           <Button
-            variant="contained"
+            variant="outlined"
             color="error"
             onClick={handleOpenDialog}
-            sx={{ ml: 2, color: "#fff" }}
+            sx={{
+              ml: 2,
+              minWidth: 0,
+              borderRadius: "50%",
+              padding: "10px",
+              width: "40px",
+              height: "40px",
+            }}
           >
-            Delete all
+            <DeleteForeverIcon />
           </Button>
         </div>
         <Grid container spacing={2} alignItems="center">
