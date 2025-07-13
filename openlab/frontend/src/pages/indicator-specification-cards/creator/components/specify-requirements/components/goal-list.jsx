@@ -8,6 +8,7 @@ import {
   TextField,
   Tooltip,
   Typography,
+  Button,
 } from "@mui/material";
 import { ISCContext } from "../../../indicator-specification-card.jsx";
 import { Close as CloseIcon } from "@mui/icons-material";
@@ -140,22 +141,35 @@ const GoalList = () => {
           }}
           renderOption={(props, option) => {
             const { key, ...restProps } = props;
+            const isAddOption = typeof option.verb === "string" && option.verb.startsWith('Add "');
             return (
               <li key={key} {...restProps}>
                 <Grid container alignItems="center">
                   <Grid item xs>
-                    <Tooltip
-                      arrow
-                      title={
-                        option.description ? (
-                          <Typography variant="body2" sx={{ p: 1 }}>
-                            {option.description}
-                          </Typography>
-                        ) : undefined
-                      }
-                    >
-                      <Typography>{option.verb}</Typography>
-                    </Tooltip>
+                    {isAddOption ? (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        className="goallist-add-btn"
+                        fullWidth
+                        sx={{ textTransform: "none", fontWeight: 500 }}
+                      >
+                        {option.verb}
+                      </Button>
+                    ) : (
+                      <Tooltip
+                        arrow
+                        title={
+                          option.description ? (
+                            <Typography variant="body2" sx={{ p: 1 }}>
+                              {option.description}
+                            </Typography>
+                          ) : undefined
+                        }
+                      >
+                        <Typography>{option.verb}</Typography>
+                      </Tooltip>
+                    )}
                   </Grid>
                   <Grid item>
                     {option.custom && (

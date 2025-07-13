@@ -119,7 +119,8 @@ const SpecifyRequirements = () => {
   console.log("Requirement",requirements)
   const handleUnlockPath = () => {
     handleTogglePanel();
-    // 无论 lockedStep.path.locked 是否为 true，每次都强制刷新 columns/rows，保证推荐和表格刷新
+    // Regardless of whether lockedStep.path.locked is true or false, 
+    // forcibly refresh columns/rows every time to ensure recommendations and the table are refreshed.
     addNewColumnsMethod();
     setLockedStep((prevState) => ({
       ...prevState,
@@ -135,7 +136,7 @@ const SpecifyRequirements = () => {
   const addNewColumnsMethod = () => {
     let tempColumnData = [];
     let tempRows = [];
-    // 只用 value 和 type 都有效的数据项
+    // Only include data items where both value and type are valid.
     const validData = requirements.data.filter(item => item.value && item.type && Object.values(item.type).length !== 0);
     validData.forEach((item) => {
       let fieldUUID = uuidv4();
@@ -164,7 +165,7 @@ const SpecifyRequirements = () => {
         }
       }
     });
-    // 只要有有效数据就 setDataset
+    // Set the dataset only if there is valid data.
     if (validData.length > 0) {
       setDataset((prevState) => ({
         ...prevState,
@@ -206,6 +207,8 @@ const SpecifyRequirements = () => {
 
   return (
     <>
+
+
       {/* Snackbar prompt */}
       <Snackbar
         open={state.showGoalCheckmarkTip}
@@ -213,6 +216,8 @@ const SpecifyRequirements = () => {
         autoHideDuration={4000}
         onClose={() => setState((prev) => ({ ...prev, showGoalCheckmarkTip: false }))}
       >
+
+
         <MuiAlert severity="info" sx={{ width: '100%' }}>
           Please click the checkmark on the right to confirm.
         </MuiAlert>
@@ -372,8 +377,28 @@ const SpecifyRequirements = () => {
                     <Grid item xs={12} md={8}>
                       <Grid container spacing={2}>
                         <Grid item xs sm={4}>
-                          <GoalList />
+                          <GoalList addButtonClassName="goallist-add-btn" />
                         </Grid>
+      <style>
+      {`
+        .goallist-add-btn {
+          background-color: #1976d2 !important;
+          color: #fff !important;
+          border-radius: 8px !important;
+          font-size: 1.1rem !important;
+          font-weight: 500 !important;
+          box-shadow: none !important;
+          padding: 8px 24px !important;
+          margin-top: 8px !important;
+          margin-bottom: 8px !important;
+          transition: background 0.2s, color 0.2s;
+        }
+        .goallist-add-btn:hover:not(:disabled) {
+          background-color: #1565c0 !important;
+          color: #fff !important;
+        }
+      `}
+      </style>
                         <Grid item xs={12} sm>
                           <Grid container spacing={2} alignItems="center">
                             <Grid item xs>
@@ -408,6 +433,16 @@ const SpecifyRequirements = () => {
                                 60% { transform: scale(0.95);}
                                 100% { transform: scale(1.15);}
                               }
+                              .custom-checkmark-btn {
+                                background-color: #1976d2 !important;
+                                color: #fff !important;
+                                transition: background 0.2s, color 0.2s;
+                              }
+                              .custom-checkmark-btn:hover:not(:disabled) {
+                                background-color: #fff !important;
+                                color: #1976d2 !important;
+                                border: 1.5px solid #1976d2 !important;
+                              }
                               `}
                               </style>
                               <Tooltip
@@ -418,7 +453,13 @@ const SpecifyRequirements = () => {
                               >
                                 <span>
                                   <IconButton
-                                    color="primary"
+                                    className={
+                                      requirements.goal.length > 0 &&
+                                      requirements.goalType.verb.length > 0 &&
+                                      requirements.edit.goal
+                                        ? 'custom-checkmark-btn'
+                                        : ''
+                                    }
                                     onClick={handleToggleGoalEdit}
                                     disabled={
                                       requirements.goal.length < 1 ||
@@ -430,8 +471,6 @@ const SpecifyRequirements = () => {
                                       requirements.edit.goal
                                         ? {
                                             animation: 'checkmark-bounce 0.7s',
-                                            backgroundColor: '#1976d2',
-                                            color: '#fff',
                                             transform: 'scale(1.15)',
                                             boxShadow: '0 0 8px #1976d2',
                                           }
@@ -511,13 +550,28 @@ const SpecifyRequirements = () => {
                             </Grid>
                             <Grid item>
                               <Tooltip title="Confirm">
-                                <IconButton
-                                  color="primary"
-                                  onClick={handleToggleQuestionEdit}
-                                  disabled={requirements.question.length < 1}
-                                >
-                                  <DoneIcon />
-                                </IconButton>
+                                <span>
+                                  <IconButton
+                                    className={
+                                      requirements.question.length > 0 && requirements.edit.question
+                                        ? 'custom-checkmark-btn'
+                                        : ''
+                                    }
+                                    onClick={handleToggleQuestionEdit}
+                                    disabled={requirements.question.length < 1}
+                                    sx={
+                                      requirements.question.length > 0 && requirements.edit.question
+                                        ? {
+                                            animation: 'checkmark-bounce 0.7s',
+                                            transform: 'scale(1.15)',
+                                            boxShadow: '0 0 8px #1976d2',
+                                          }
+                                        : undefined
+                                    }
+                                  >
+                                    <DoneIcon />
+                                  </IconButton>
+                                </span>
                               </Tooltip>
                             </Grid>
                           </Grid>
