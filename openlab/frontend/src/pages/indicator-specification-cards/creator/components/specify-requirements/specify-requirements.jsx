@@ -52,6 +52,31 @@ const SpecifyRequirements = () => {
   },[permissionToChange])
   const navigate = useNavigate(); // <--- Zurück zur Dashboard-Navigation
 
+  // Automatically refresh the dataset when requirements.data changes (recommendation charts will automatically refresh with changes in dataset.columns)
+  useEffect(() => {
+    addNewColumnsMethod();
+    // ...existing code...
+  }, [requirements.data]);
+
+
+  // pop up prompt after user stops typing for a while
+  React.useEffect(() => {
+    let timer;
+    if (
+      requirements.edit.goal &&
+      requirements.goalType.verb.length > 0 &&
+      requirements.goal.length > 0
+    ) {
+      timer = setTimeout(() => {
+        setState((prev) => ({ ...prev, showGoalCheckmarkTip: true }));
+      }, 2500); // pop up after 2.5 seconds
+    } else {
+      setState((prev) => ({ ...prev, showGoalCheckmarkTip: false }));
+    }
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [requirements.edit.goal, requirements.goalType.verb, requirements.goal]);
   const handleTogglePanel = () => {
     setLockedStep((prevState) => ({
       ...prevState,
