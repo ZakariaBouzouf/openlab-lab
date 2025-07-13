@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext,useState } from "react";
 import {
   Box,
   Grid,
@@ -14,15 +14,31 @@ import {
 import { ISCContext } from "../../../indicator-specification-card.jsx";
 import { Alert } from "@mui/lab";
 
-const CsvImporter = () => {
+const CsvImporter = ({ fileError, setFileError }) => { //Modification-1 part-6 can use setfileError to set error
   const { dataset, setDataset } = useContext(ISCContext);
-
   const handleImportFile = (event) => {
+  const selectedFile = event.target.files[0];
+  if (!selectedFile) return;
+
+  const isCSV = selectedFile.name.toLowerCase().endsWith(".csv");
+
+  if (!isCSV) {
+    //  Set the file name to trigger the display area (Modification-1 part-1 )
     setDataset((prevState) => ({
       ...prevState,
-      file: event.target.files[0],
+      file: { name: selectedFile.name },
     }));
-  };
+    setFileError("Invalid file format. Only .csv files are supported.");
+  } else {
+    //  normal condition (Modification-2 part-2)
+
+    setDataset((prevState) => ({
+      ...prevState,
+      file: selectedFile,
+    }));
+    setFileError(""); // Clear error message (Modification-2 part-3)
+  }
+};
 
   const handleRemoveFile = () => {
     setDataset((prevState) => ({
@@ -59,6 +75,11 @@ const CsvImporter = () => {
                       <Typography sx={{ fontWeight: "bold", ml: 1 }}>
                         {dataset.file.name}
                       </Typography>
+                      {fileError && (
+                       <Typography color="error" variant="body2" sx={{ ml: 4, mt: 1 }}>
+                       {fileError}
+                      </Typography>
+                       )}{/*Modification-3 row 79-83*/ }
                     </Grid>
                   </Grid>
                 </Grid>
