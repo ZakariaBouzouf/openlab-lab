@@ -19,11 +19,8 @@ const VisualizationDescription = ({ toggleDescription }) => {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Grid container justifyContent="flex-end">
-            <Tooltip title="Close description">
-              <IconButton onClick={toggleDescription}>
-                <CloseIcon color="primary" />
-              </IconButton>
-            </Tooltip>
+            {/* empty Grid  */}
+            <div style={{ width: '20px', height: '20px' }}></div>
           </Grid>
         </Grid>
 

@@ -334,6 +334,24 @@ const CreatorHeader = ({
                     </Button>
                   </Tooltip>
                 </Grid>
+                <Grid item>
+                  <Tooltip
+                    arrow
+                    title={
+                      <Typography variant="body2" sx={{ p: 1 }}>
+                        Zum Dashboard wechseln
+                      </Typography>
+                    }
+                  >
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => navigate("/isc")}
+                    >
+                      Zum Dashboard
+                    </Button>
+                  </Tooltip>
+                </Grid>
               </Grid>
             </Grid>
           </Grid>
