@@ -29,6 +29,8 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useNavigate } from "react-router-dom";
 const SpecifyRequirements = () => {
   const [open, setOpen] = useState(false);
   const [permissionToChange, setPermissionToChange] = useState(false);
@@ -51,12 +53,16 @@ const SpecifyRequirements = () => {
       setPermissionToChange(false);
     }
   },[permissionToChange])
+  
+  const navigate = useNavigate(); // <--- Zurück zur Dashboard-Navigation
 
   // Automatically refresh the dataset when requirements.data changes (recommendation charts will automatically refresh with changes in dataset.columns)
   useEffect(() => {
     addNewColumnsMethod();
     // ...existing code...
   }, [requirements.data]);
+ 
+
 
 
   // pop up prompt after user stops typing for a while
