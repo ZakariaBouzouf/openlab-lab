@@ -250,6 +250,7 @@ const IndicatorSpecificationCard = () => {
       requirements: { locked: false, openPanel: true, step: "1" },
       path: { locked: true, openPanel: false, step: "2" },
       visualization: { locked: true, openPanel: false, step: "0" },
+      method: { locked: true, type: "", openPanel: false, step: "0" },
       dataset: { locked: true, openPanel: false, step: "0" },
       finalize: { locked: true, openPanel: false, step: "5" },
     });
