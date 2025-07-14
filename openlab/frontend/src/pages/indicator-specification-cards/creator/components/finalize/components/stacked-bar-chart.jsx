@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { CustomThemeContext } from "../../../../../../setup/theme-manager/theme-context-manager.jsx";
 import {
   Button,
@@ -17,11 +17,20 @@ import PaletteIcon from "@mui/icons-material/Palette";
 import CloseIcon from "@mui/icons-material/Close";
 import CustomizationPanel from "./customization-panel/customization-panel.jsx";
 import { ISCContext } from "../../../indicator-specification-card.jsx";
+import ChartErrorBoundary from "./chart-error-boundary.jsx";
 
 const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
   const { darkMode } = useContext(CustomThemeContext);
   const { visRef, setVisRef, dataset } = useContext(ISCContext);
   const chartRef = useRef(null);
+  const isMountedRef = useRef(true);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const [state, setState] = useState({
     series: [],
@@ -60,12 +69,12 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
       isSortingOrderDescendingAvailable: false,
       isCategoriesFilteringAvailable: true,
     },
-    options: visRef.edit
-      ? visRef.data.options
+    options: visRef?.edit
+      ? visRef.data?.options || {}
       : {
           chart: {
-            type: visRef.chart.code,
-            id: visRef.chart.code,
+            type: visRef?.chart?.code || "bar",
+            id: visRef?.chart?.code || "bar",
             stacked: true,
             width: "100%",
             foreColor: darkMode ? "#ffffff" : "#000000",
@@ -194,12 +203,18 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
   }, [darkMode]);
 
   useEffect(() => {
+    // Add safety checks for dataset
+    if (!dataset || !dataset.columns || dataset.columns.length === 0) {
+      return;
+    }
+    
     const stringColumns = dataset.columns.filter(
       (col) => col.type === "string"
     );
     const numberColumns = dataset.columns.filter(
       (col) => col.type === "number"
     );
+    
     setState((prevState) => ({
       ...prevState,
       axisOptions: {
@@ -209,6 +224,7 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
         barValueOptions: stringColumns,
       },
     }));
+    
     setVisRef((prevVisRef) => ({
       ...prevVisRef,
       data: {
@@ -222,60 +238,74 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
       },
       edit: false,
     }));
-  }, [dataset.columns.length]);
+  }, [dataset?.columns?.length]); // Avoid errors by using optional chaining
 
   // * Executes only when dataset changes.
   // * This effect is used to populate the xAxis, yAxis, and groupBy options.
   // * If new dataset or new column is provided, it will set the xAxis and yAxis options based on the dataset columns.
   useEffect(() => {
+    // Add safety checks
+    if (!dataset || !dataset.columns || dataset.columns.length === 0) {
+      return;
+    }
+    
     const selectedXAxis =
-      visRef.data.axisOptions.selectedXAxis || state.axisOptions.selectedXAxis;
+      visRef?.data?.axisOptions?.selectedXAxis || state.axisOptions.selectedXAxis;
     const selectedYAxis =
-      visRef.data.axisOptions.selectedYAxis || state.axisOptions.selectedYAxis;
+      visRef?.data?.axisOptions?.selectedYAxis || state.axisOptions.selectedYAxis;
     const selectedBarValue =
-      visRef.data.axisOptions.selectedBarValue ||
+      visRef?.data?.axisOptions?.selectedBarValue ||
       state.axisOptions.selectedBarValue;
     const stringColumns =
-      visRef.data.axisOptions.xAxisOptions || state.axisOptions.xAxisOptions;
+      visRef?.data?.axisOptions?.xAxisOptions || state.axisOptions.xAxisOptions;
     const numberColumns =
-      visRef.data.axisOptions.yAxisOptions || state.axisOptions.yAxisOptions;
+      visRef?.data?.axisOptions?.yAxisOptions || state.axisOptions.yAxisOptions;
+
+    // Ensure we have valid arrays
+    if (!Array.isArray(stringColumns) || !Array.isArray(numberColumns)) {
+      return;
+    }
 
     let updatedSelectedXAxis = "";
-    if (visRef.edit && selectedXAxis.length !== 0)
+    if (visRef?.edit && selectedXAxis && selectedXAxis.length !== 0)
       updatedSelectedXAxis = selectedXAxis;
-    else if (selectedXAxis.length !== 0)
+    else if (selectedXAxis && selectedXAxis.length !== 0)
       updatedSelectedXAxis =
         stringColumns.find((col) => col.field === selectedXAxis)?.field ||
-        (stringColumns.length > 0 ? stringColumns[0].field : "");
+        (stringColumns.length > 0 ? stringColumns[0]?.field || "" : "");
     else
       updatedSelectedXAxis =
-        stringColumns.length > 0 ? stringColumns[0].field : "";
+        stringColumns.length > 0 ? stringColumns[0]?.field || "" : "";
 
     let updatedSelectedYAxis = "";
-    if (visRef.edit && selectedYAxis.length !== 0)
+    if (visRef?.edit && selectedYAxis && selectedYAxis.length !== 0)
       updatedSelectedYAxis = selectedYAxis;
-    else if (selectedYAxis.length !== 0)
+    else if (selectedYAxis && selectedYAxis.length !== 0)
       updatedSelectedYAxis =
         numberColumns.find((col) => col.field === selectedYAxis)?.field ||
-        (numberColumns.length > 0
-          ? numberColumns[1]?.field
-          : numberColumns[0]?.field || "");
+        (numberColumns.length > 1
+          ? numberColumns[1]?.field || ""
+          : numberColumns.length > 0 
+          ? numberColumns[0]?.field || ""
+          : "");
     else
       updatedSelectedYAxis =
-        numberColumns.length > 0 ? numberColumns[0].field : "";
+        numberColumns.length > 0 ? numberColumns[0]?.field || "" : "";
 
     let updatedSelectedBarValue = "";
-    if (visRef.edit && selectedBarValue.length !== 0)
+    if (visRef?.edit && selectedBarValue && selectedBarValue.length !== 0)
       updatedSelectedBarValue = selectedBarValue;
-    else if (selectedBarValue.length !== 0)
+    else if (selectedBarValue && selectedBarValue.length !== 0)
       updatedSelectedBarValue =
         stringColumns.find((col) => col.field === selectedBarValue)?.field ||
-        (stringColumns.length > 0 ? stringColumns[0]?.field : "");
+        (stringColumns.length > 0 ? stringColumns[0]?.field || "" : "");
     else
       updatedSelectedBarValue =
-        stringColumns.length > 0
-          ? stringColumns[1]?.field
-          : stringColumns[0]?.field || "";
+        stringColumns.length > 1
+          ? stringColumns[1]?.field || ""
+          : stringColumns.length > 0
+          ? stringColumns[0]?.field || ""
+          : "";
 
     setState((prevState) => ({
       ...prevState,
@@ -287,14 +317,31 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
       },
     }));
   }, [
-    visRef.data.axisOptions.xAxisOptions,
-    visRef.data.axisOptions.yAxisOptions,
-    visRef.data.axisOptions.barValueOptions,
+    visRef.data?.axisOptions?.xAxisOptions?.length,
+    visRef.data?.axisOptions?.yAxisOptions?.length,
+    visRef.data?.axisOptions?.barValueOptions?.length,
   ]);
 
   useEffect(() => {
     const { selectedXAxis, selectedBarValue, selectedYAxis } =
       state.axisOptions;
+    
+    // Add safety checks for dataset and columns
+    if (!dataset || !dataset.columns || !dataset.rows || dataset.rows.length === 0) {
+      setState((prevState) => ({
+        ...prevState,
+        series: [],
+        options: {
+          ...prevState.options,
+          xaxis: {
+            ...prevState.options.xaxis,
+            categories: [],
+          },
+        },
+      }));
+      return;
+    }
+
     const xAxisColumn = dataset.columns.find(
       (col) => col.field === selectedXAxis
     );
@@ -304,107 +351,215 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
     const barValueColumn = dataset.columns.find(
       (col) => col.field === selectedBarValue
     );
-    if (!xAxisColumn || !yAxisColumn || !barValueColumn) return;
+    
+    // Enhanced validation
+    if (!xAxisColumn || !yAxisColumn || !barValueColumn || 
+        !selectedXAxis || !selectedYAxis || !selectedBarValue) {
+      return;
+    }
 
-    // * Group and sum values by xAxis
-    const aggregatedData = dataset.rows.reduce((acc, row) => {
-      const category = row[selectedXAxis];
-      const value = row[selectedYAxis] || 0;
-      if (!acc[category]) acc[category] = { name: category, data: {} };
-      const barLabel = row[selectedBarValue] || "Unknown";
-      if (!acc[category].data[barLabel]) {
-        acc[category].data[barLabel] = 0;
-      }
-      acc[category].data[barLabel] += value;
-      return acc;
-    }, {});
+    try {
+      // * Group and sum values by xAxis with enhanced error handling
+      const aggregatedData = dataset.rows.reduce((acc, row, index) => {
+        // Ensure row exists and has required fields
+        if (!row || typeof row !== 'object') {
+          console.warn(`Skipping invalid row at index ${index}:`, row);
+          return acc;
+        }
+        
+        // Get values with safe fallbacks
+        const categoryValue = row[selectedXAxis];
+        const numericValue = row[selectedYAxis];
+        const barLabelValue = row[selectedBarValue];
+        
+        // Skip row if critical values are missing
+        if (categoryValue == null || numericValue == null) {
+          console.warn(`Skipping row ${index} due to missing values:`, {
+            category: categoryValue,
+            numeric: numericValue,
+            barLabel: barLabelValue
+          });
+          return acc;
+        }
+        
+        // Convert and validate values
+        const category = String(categoryValue).trim();
+        const value = Number(numericValue);
+        const barLabel = String(barLabelValue || "Unknown").trim();
+        
+        // Skip if conversion failed
+        if (!category || isNaN(value)) {
+          console.warn(`Skipping row ${index} due to invalid conversion:`, {
+            originalCategory: categoryValue,
+            category,
+            originalValue: numericValue,
+            value,
+            barLabel
+          });
+          return acc;
+        }
+        
+        // Initialize category if it doesn't exist
+        if (!acc[category]) {
+          acc[category] = { name: category, data: {} };
+        }
+        
+        // Initialize bar label if it doesn't exist
+        if (!acc[category].data[barLabel]) {
+          acc[category].data[barLabel] = 0;
+        }
+        
+        // Add value safely
+        acc[category].data[barLabel] += value;
+        return acc;
+      }, {});
 
-    const categories = Object.keys(aggregatedData);
-    const barLabels = Array.from(
-      new Set(dataset.rows.map((row) => row[selectedBarValue] || "Unknown"))
-    );
+      const categories = Object.keys(aggregatedData);
+      
+      // Get all unique bar labels with safe processing
+      const barLabels = Array.from(
+        new Set(
+          dataset.rows
+            .map((row) => {
+              if (!row || typeof row !== 'object') return "Unknown";
+              const value = row[selectedBarValue];
+              return String(value || "Unknown").trim();
+            })
+            .filter(label => label && label !== "")
+        )
+      );
 
-    const series = barLabels.map((barLabel) => ({
-      name: barLabel,
-      data: categories.map(
-        (category) => aggregatedData[category].data[barLabel] || 0
-      ),
-    }));
-
-    setState((prevState) => {
-      let tempState = {
-        ...prevState,
-        series: series,
-        options: {
-          ...prevState.options,
-          xaxis: {
-            ...prevState.options.xaxis,
-            categories: categories,
-            title: {
-              style: {
-                cssClass: "x-y-axis-show-title",
-              },
-              text:
-                dataset.columns.find((col) => col.field === selectedXAxis)
-                  ?.headerName || "Group By",
-            },
-          },
-          yaxis: {
-            ...prevState.options.yaxis,
-            title: {
-              style: {
-                cssClass: "x-y-axis-show-title",
-              },
-              text:
-                dataset.columns.find((col) => col.field === selectedYAxis)
-                  ?.headerName || "Counts",
-            },
-          },
-          plotOptions: {
-            ...prevState.options.plotOptions,
-            bar: {
-              ...prevState.options.plotOptions.bar,
-              stacked: true,
-            },
-          },
-        },
-      };
-      setVisRef((prevVisRef) => ({
-        ...prevVisRef,
-        data: {
-          ...prevVisRef.data,
-          series: tempState.series,
-          options: tempState.options,
-          axisOptions: {
-            ...prevVisRef.data.axisOptions,
-            selectedXAxis: state.axisOptions.selectedXAxis,
-            selectedBarValue: state.axisOptions.selectedBarValue,
-            selectedYAxis: state.axisOptions.selectedYAxis,
-          },
-        },
+      // Create series with safe data access
+      const series = barLabels.map((barLabel) => ({
+        name: barLabel,
+        data: categories.map(
+          (category) => {
+            const categoryData = aggregatedData[category];
+            if (!categoryData || !categoryData.data) return 0;
+            return categoryData.data[barLabel] || 0;
+          }
+        ),
       }));
-      return tempState;
-    });
+    
+      // Ensure we have valid data before updating state
+      if (categories.length === 0 || series.length === 0) {
+        if (isMountedRef.current) {
+          setState((prevState) => ({
+            ...prevState,
+            series: [],
+            options: {
+              ...prevState.options,
+              xaxis: {
+                ...prevState.options.xaxis,
+                categories: [],
+              },
+            },
+          }));
+        }
+        return;
+      }
+
+      // Only update state if component is still mounted
+      if (isMountedRef.current) {
+        setState((prevState) => {
+          let tempState = {
+            ...prevState,
+            series: series,
+            options: {
+              ...prevState.options,
+              xaxis: {
+                ...prevState.options.xaxis,
+                categories: categories,
+                title: {
+                  style: {
+                    cssClass: "x-y-axis-show-title",
+                  },
+                  text:
+                    dataset.columns.find((col) => col.field === selectedXAxis)
+                      ?.headerName || "Group By",
+                },
+              },
+              yaxis: {
+                ...prevState.options.yaxis,
+                title: {
+                  style: {
+                    cssClass: "x-y-axis-show-title",
+                  },
+                  text:
+                    dataset.columns.find((col) => col.field === selectedYAxis)
+                      ?.headerName || "Counts",
+                },
+              },
+              plotOptions: {
+                ...prevState.options.plotOptions,
+                bar: {
+                  ...prevState.options.plotOptions.bar,
+                  stacked: true,
+                },
+              },
+            },
+          };
+          
+          // Also update visRef safely
+          if (isMountedRef.current) {
+            setVisRef((prevVisRef) => ({
+              ...prevVisRef,
+              data: {
+                ...prevVisRef.data,
+                series: tempState.series,
+                options: tempState.options,
+                axisOptions: {
+                  ...prevVisRef.data.axisOptions,
+                  selectedXAxis: state.axisOptions.selectedXAxis,
+                  selectedBarValue: state.axisOptions.selectedBarValue,
+                  selectedYAxis: state.axisOptions.selectedYAxis,
+                },
+              },
+            }));
+          }
+          
+          return tempState;
+        });
+      }
+    } catch (error) {
+      console.error("Error processing stacked bar chart data:", error);
+      // Set empty state on error only if component is mounted
+      if (isMountedRef.current) {
+        setState((prevState) => ({
+          ...prevState,
+          series: [],
+          options: {
+            ...prevState.options,
+            xaxis: {
+              ...prevState.options.xaxis,
+              categories: [],
+            },
+          },
+        }));
+      }
+    }
   }, [
-    dataset,
+    dataset?.rows?.length,
     state.axisOptions.selectedXAxis,
     state.axisOptions.selectedYAxis,
     state.axisOptions.selectedBarValue,
   ]);
 
   useEffect(() => {
-    setVisRef((prevVisRef) => ({
-      ...prevVisRef,
-      data: {
-        ...prevVisRef.data,
-        series: state.series,
-        options: state.options,
-        axisOptions: state.axisOptions,
-      },
-    }));
-  }, [state.series, state.options, state.axisOptions]);
+    if (isMountedRef.current) {
+      setVisRef((prevVisRef) => ({
+        ...prevVisRef,
+        data: {
+          ...prevVisRef.data,
+          series: state.series,
+          options: state.options,
+          axisOptions: state.axisOptions,
+        },
+      }));
+    }
+  }, [state.series.length, state.axisOptions.selectedXAxis, state.axisOptions.selectedYAxis, state.axisOptions.selectedBarValue]); // 修改依赖项避免循环
 
-  const handleXAxisChange = (event) => {
+  const handleXAxisChange = useCallback((event) => {
     setState((prevState) => ({
       ...prevState,
       axisOptions: {
@@ -412,9 +567,9 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
         selectedXAxis: event.target.value,
       },
     }));
-  };
+  }, []);
 
-  const handleBarValueChange = (event) => {
+  const handleBarValueChange = useCallback((event) => {
     setState((prevState) => ({
       ...prevState,
       axisOptions: {
@@ -422,9 +577,9 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
         selectedBarValue: event.target.value,
       },
     }));
-  };
+  }, []);
 
-  const handleYAxisChange = (event) => {
+  const handleYAxisChange = useCallback((event) => {
     setState((prevState) => ({
       ...prevState,
       axisOptions: {
@@ -432,7 +587,7 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
         selectedYAxis: event.target.value,
       },
     }));
-  };
+  }, []);
 
   // Get selected column
   const selectedXAxisColumn = state.axisOptions.xAxisOptions.find(
@@ -540,25 +695,69 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
 
         <Grow in={!customize} timeout={{ enter: 500, exit: 0 }} unmountOnExit>
           <Grid size={{ xs: 12 }} sx={{ minHeight: 600 }}>
-            <Chart
-              ref={chartRef}
-              options={state.options}
-              series={state.series}
-              type={visRef.chart.code}
-              height="100%"
-            />
+            {state.series && 
+             state.series.length > 0 && 
+             state.options &&
+             state.options.xaxis &&
+             state.options.xaxis.categories &&
+             visRef?.chart?.code ? (
+              <ChartErrorBoundary>
+                <Chart
+                  ref={chartRef}
+                  options={state.options}
+                  series={state.series}
+                  type={visRef?.chart?.code || "bar"}
+                  height="100%"
+                />
+              </ChartErrorBoundary>
+            ) : (
+              <Typography 
+                variant="body1" 
+                align="center" 
+                sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  height: '100%' 
+                }}
+              >
+                Please select all required fields and ensure data is available to display the chart.
+              </Typography>
+            )}
           </Grid>
         </Grow>
 
         <Grow in={customize} timeout={{ enter: 500, exit: 0 }} unmountOnExit>
           <Grid size={{ xs: 12, md: 8 }} sx={{ minHeight: 600 }}>
-            <Chart
-              ref={chartRef}
-              options={state.options}
-              series={state.series}
-              type={visRef.chart.code}
-              height="100%"
-            />
+            {state.series && 
+             state.series.length > 0 && 
+             state.options &&
+             state.options.xaxis &&
+             state.options.xaxis.categories &&
+             visRef?.chart?.code ? (
+              <ChartErrorBoundary>
+                <Chart
+                  ref={chartRef}
+                  options={state.options}
+                  series={state.series}
+                  type={visRef?.chart?.code || "bar"}
+                  height="100%"
+                />
+              </ChartErrorBoundary>
+            ) : (
+              <Typography 
+                variant="body1" 
+                align="center" 
+                sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  height: '100%' 
+                }}
+              >
+                Please select all required fields and ensure data is available to display the chart.
+              </Typography>
+            )}
           </Grid>
         </Grow>
         <Grow in={customize} timeout={{ enter: 500, exit: 0 }} unmountOnExit>
