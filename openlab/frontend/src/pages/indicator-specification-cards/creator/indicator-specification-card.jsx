@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useRef, useState } from "react";
-import { Divider, Typography, Button, IconButton } from "@mui/material";
+import { Divider, Typography, Button, IconButton, Tooltip } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import SpecifyRequirements from "./components/specify-requirements/specify-requirements.jsx";
 import ChoosePath from "./components/choose-path/choose-path.jsx";
@@ -269,7 +269,7 @@ const IndicatorSpecificationCard = () => {
     <>
       {/* Bestätigungsdialog */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>Are you sure you want to delete all?</DialogTitle>
+        <DialogTitle>Are you sure you want to RESET?</DialogTitle>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="primary">
             No
@@ -279,22 +279,24 @@ const IndicatorSpecificationCard = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      <ISCContext.Provider
-        value={{
-          id,
-          requirements,
-          setRequirements,
-          lockedStep,
-          setLockedStep,
-          visRef,
-          setVisRef,
-          dataset,
-          setDataset,
+
+      {/* Sticky Header ganz oben, über dem Content */}
+      <div
+        style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 1201, // höher als Sidebar/Settings
+          background: "#fff",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          width: "100%",
+          padding: "12px 24px 12px 24px",
+          borderBottom: "1px solid #eee",
         }}
       >
-        {/* Button und Titel in einer Zeile */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", marginBottom: 16 }}>
-          <div style={{ display: "flex", alignItems: "center" }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Tooltip title="ISC Dashboard" placement="bottom">
             <IconButton
               color="primary"
               onClick={() => navigate("/isc")}
@@ -302,8 +304,12 @@ const IndicatorSpecificationCard = () => {
             >
               <HomeIcon />
             </IconButton>
-            <Typography>ISC Creator</Typography>
-          </div>
+          </Tooltip>
+          <Typography variant="h6">
+            ISC Creator
+          </Typography>
+        </div>
+        <Tooltip title="Reset ISC" placement="bottom">
           <Button
             variant="outlined"
             color="error"
@@ -319,7 +325,22 @@ const IndicatorSpecificationCard = () => {
           >
             <DeleteForeverIcon />
           </Button>
-        </div>
+        </Tooltip>
+      </div>
+
+      <ISCContext.Provider
+        value={{
+          id,
+          requirements,
+          setRequirements,
+          lockedStep,
+          setLockedStep,
+          visRef,
+          setVisRef,
+          dataset,
+          setDataset,
+        }}
+      >
         <Grid container spacing={2} alignItems="center">
           {/* Delete all Button entfernt aus Grid */}
           <Grid item xs={12} sx={{ mb: 2 }}>
