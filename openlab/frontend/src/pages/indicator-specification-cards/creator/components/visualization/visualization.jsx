@@ -27,6 +27,7 @@ const Visualization = () => {
     lockedStep,
     setLockedStep,
     visRef,
+    chartIsValid,
   } = useContext(ISCContext);
   const [state, setState] = useState({
     showSelections: true,
@@ -206,7 +207,7 @@ const Visualization = () => {
                 <Button
                   fullWidth
                   variant="contained"
-                  disabled={visRef.chart.type === ""}
+                  disabled={visRef.chart.type === "" || !chartIsValid}
                   onClick={
                     lockedStep.visualization.step === "3"
                       ? handleUnlockDataset

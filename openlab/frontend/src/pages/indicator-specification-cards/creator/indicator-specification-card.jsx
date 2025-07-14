@@ -153,6 +153,8 @@ const IndicatorSpecificationCard = () => {
         };
   });
 
+  const [chartIsValid, setChartIsValid] = useState(false);
+
   const prevDependencies = useRef({
     requirements,
     dataset,

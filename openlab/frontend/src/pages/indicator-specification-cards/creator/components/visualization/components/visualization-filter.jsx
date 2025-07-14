@@ -19,7 +19,7 @@ import VisualizationDescription from "./visualization-description.jsx";
 import { Recommend } from "@mui/icons-material";
 
 const VisualizationFilter = () => {
-  const { dataset, visRef, setVisRef } = useContext(ISCContext);
+  const { dataset, visRef, setVisRef, setChartIsValid } = useContext(ISCContext);
   const [warning, setWarning] = React.useState("");
   const [state, setState] = React.useState({
     openFilters: false,
@@ -175,6 +175,7 @@ const VisualizationFilter = () => {
   const onChartClick = (visualization) => {
     handleSelectVisualization(visualization);
     const meetsRequirements = checkVisualizationRecommendation(visualization, columnTypes);
+    setChartIsValid(meetsRequirements);
     if (!meetsRequirements) {
       const missing = getMissingDataTypes(visualization, columnTypes);
       setWarning(`Missing data: Please add ${missing.join(" and ")} to your dataset.`);
