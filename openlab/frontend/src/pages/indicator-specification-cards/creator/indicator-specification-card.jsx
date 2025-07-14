@@ -153,6 +153,8 @@ const IndicatorSpecificationCard = () => {
         };
   });
 
+  const [chartIsValid, setChartIsValid] = useState(false);
+
   const prevDependencies = useRef({
     requirements,
     dataset,
@@ -290,6 +292,8 @@ const IndicatorSpecificationCard = () => {
           setVisRef,
           dataset,
           setDataset,
+          chartIsValid,
+          setChartIsValid,
         }}
       >
         {/* Button und Titel in einer Zeile */}
