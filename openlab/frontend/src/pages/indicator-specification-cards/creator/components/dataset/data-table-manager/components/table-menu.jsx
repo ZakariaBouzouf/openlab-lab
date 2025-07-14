@@ -11,7 +11,7 @@ import DeleteDialog from "../../../../../../../common/components/delete-dialog/d
 import { ISCContext } from "../../../../indicator-specification-card.jsx";
 
 const TableMenu = ({ state, setState }) => {
-  const { setDataset } = useContext(ISCContext);
+  const { setDataset, dataset } = useContext(ISCContext);
 
   const handleToggleMenu = () => {
     setState((prevState) => ({
@@ -34,6 +34,11 @@ const TableMenu = ({ state, setState }) => {
       columns: [],
       file: { name: "" },
     }));
+    setState((prevState) => ({
+      ...prevState,
+      deleteDialog: false, // Close pop-up window after deletion
+      anchorEl: null,
+    }));
   };
 
   return (
@@ -51,7 +56,10 @@ const TableMenu = ({ state, setState }) => {
           horizontal: "right",
         }}
       >
-        <MenuItem onClick={handleOpenDeleteDialog}>
+        <MenuItem
+          onClick={handleOpenDeleteDialog}
+          disabled={dataset.rows.length === 0 && dataset.columns.length === 0}
+        >
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
@@ -62,30 +70,35 @@ const TableMenu = ({ state, setState }) => {
         open={state.deleteDialog}
         toggleOpen={handleOpenDeleteDialog}
         message={
-          <>
-            <Typography gutterBottom>
-              Deleting this dataset will permanently remove all associated data
-              and cannot be undone. Please consider the following before
-              proceeding:
-            </Typography>
-            <Typography gutterBottom>
-              <li>All data contained within this dataset will be lost.</li>
-              <li>
-                Any analyses or reports dependent on this dataset may be
-                affected.
-              </li>
-              <li>
-                There is no way to recover this dataset once it is deleted.
-              </li>
-            </Typography>
-            <Typography gutterBottom>
-              If you are certain about deleting this dataset, please click the
-              "Delete" button below. Otherwise, click "Cancel" to keep the
-              dataset intact.
-            </Typography>
-          </>
+          dataset.rows.length === 0 && dataset.columns.length === 0 ? (
+            <Typography gutterBottom>There is no dataset to delete.</Typography>
+          ) : (
+            <>
+              <Typography gutterBottom>
+                Deleting this dataset will permanently remove all associated data
+                and cannot be undone. Please consider the following before
+                proceeding:
+              </Typography>
+              <Typography gutterBottom>
+                <li>All data contained within this dataset will be lost.</li>
+                <li>
+                  Any analyses or reports dependent on this dataset may be
+                  affected.
+                </li>
+                <li>
+                  There is no way to recover this dataset once it is deleted.
+                </li>
+              </Typography>
+              <Typography gutterBottom>
+                If you are certain about deleting this dataset, please click the
+                "Delete" button below. Otherwise, click "Cancel" to keep the
+                dataset intact.
+              </Typography>
+            </>
+          )
         }
         handleDelete={handleDeleteDataset}
+        deleteDisabled={dataset.rows.length === 0 && dataset.columns.length === 0}
       />
     </>
   );

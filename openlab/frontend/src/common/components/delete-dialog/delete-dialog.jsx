@@ -7,10 +7,11 @@ import {
   DialogTitle,
 } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const DeleteDialog = ({ open, toggleOpen, message, handleDelete }) => {
   const [loading, setLoading] = useState(false);
+
   const handleClose = () => {
     setLoading(true);
     handleDelete(() => {
@@ -18,6 +19,13 @@ const DeleteDialog = ({ open, toggleOpen, message, handleDelete }) => {
       setLoading(false);
     });
   };
+
+  // Reset loading state when popup is closed
+  useEffect(() => {
+    if (!open) {
+      setLoading(false);
+    }
+  }, [open]);
 
   return (
     <>
