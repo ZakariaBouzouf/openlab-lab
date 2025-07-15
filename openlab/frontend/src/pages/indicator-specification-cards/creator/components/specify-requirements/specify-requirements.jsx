@@ -9,10 +9,12 @@ import {
   Grid,
   Grow,
   IconButton,
+  Snackbar,
   TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
+import MuiAlert from "@mui/material/Alert"
 import { ISCContext } from "../../indicator-specification-card.jsx";
 import GoalList from "./components/goal-list.jsx";
 import DataList from "./components/data-list.jsx";
@@ -27,7 +29,6 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
 const SpecifyRequirements = () => {
   const [open, setOpen] = useState(false);
