@@ -8,12 +8,11 @@ import React, {
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 import { ISCContext } from "../../../indicator-specification-card.jsx";
 import { ClearAll as ClearAllIcon } from "@mui/icons-material";
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Fade, Grid, Grid2, IconButton, MenuItem, Paper, Table, TableContainer, TextField, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Fade, Grid, IconButton, MenuItem, Paper, TextField, Typography } from "@mui/material";
 import Footer from "./components/footer.jsx";
 import NoRowsOverlay from "./components/no-rows-overlay.jsx";
 import ColumnMenu from "./column-menu/column-menu.jsx";
 import TableHeaderBar from "./components/table-header-bar.jsx";
-import { enqueueSnackbar } from "notistack";
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -26,7 +25,7 @@ import {
 import { v4 as uuidv4 } from "uuid"
 import { DataTypes } from "../../../utils/data/config.js";
 import AddRowDialog from "../components/add-row-dialog.jsx";
-import Tables3 from "../tables3.jsx";
+import { enqueueSnackbar } from "notistack";
 
 
 const DataTableManager = () => {
@@ -227,7 +226,7 @@ const DataTableManager = () => {
   };
   const handleAddRow2 = () => {
     console.log("I was clicked")
-    setShowAddRowDialog((prevState) => !prevState)
+    setShowAddRowDialog((prevState)=> !prevState)
   }
 
   const paginatedRows = dataset.rows.slice(
@@ -346,16 +345,16 @@ const DataTableManager = () => {
     toggleOpen();
   };
 
-  const handleAddOneRow = () => {
+  const handleAddOneRow = () =>{
     let tempColumnData = dataset.columns
-    const newRow = { id: uuidv4() }
+    const newRow = {id: uuidv4()}
     tempColumnData.forEach((column) => {
       newRow[column.field] = column.type === "number" ? 0 : "";
     });
 
-    setDataset((prevState) => ({
+    setDataset((prevState) =>({
       ...prevState,
-      rows: [...prevState.rows, newRow]
+      rows:[...prevState.rows, newRow]
     }))
 
     enqueueSnackbar("New row added successfully", {
@@ -387,10 +386,229 @@ const DataTableManager = () => {
           <TableHeaderBar />
         </Grid>
         <Grid item xs={12}>
+          <Paper
+            elevation={0}
+            sx={{
+              position: 'relative',
+              borderRadius: 3,
+              border: '1px solid #e2e8f0',
+              overflow: 'visible',
+            }}
+          >
+            <Box sx={{ position: 'relative', overflow: 'hidden', borderRadius: 3 }}>
+              <DataGrid
+                columns={columnTypeLabel}
+                rows={paginatedRows}
+                // editMode="row"
+                rowModesModel={rowModesModel}
+                onRowModesModelChange={handleRowModesModelChange}
+                onRowEditStop={handleRowEditStop}
+                processRowUpdate={processRowUpdate}
+                disableColumnMenu={false}
+                // slots={{
+                //   noRowsOverlay: NoRowsOverlay,
+                // }}
+                // sx={{
+                //   '& .MuiDataGrid-row:hover': {
+                //     backgroundColor: '#f8fafc',
+                //   },
+                // }}
+                pageSizeOptions={[5, 10, 25]}
+                rowHeight={40}
+                sx={style.dataGrid}
+                apiRef={apiRef}
+                onCellModesModelChange={handleCellModesModelChange}
+                onCellClick={handleCellClick}
+                disableRowSelectionOnClick
+                hideFooterPagination
+                hideFooterSelectedRowCount
+                showFooterRowCount
+                showFooterSelectedRowCount
+                slots={{
+                  noRowsOverlay: () => <NoRowsOverlay />,
+                  columnMenu: (props) => <ColumnMenu props={props} />,
+                  footer: () => <Footer state={state} setState={setState} />,
+                }}
+
+              />
+
+              {/* Add Row Hover Area - Extended below the table */}
+              <Box
+                sx={{
+                  position: 'absolute',
+                  bottom: -10,
+                  height: 60,
+                  left: 0,
+                  right: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: 'transparent',
+                  zIndex: 10,
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={() => setShowAddRowHover(true)}
+                onMouseLeave={() => setShowAddRowHover(false)}
+              >
+                <Fade in={showAddRowHover}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                      border: '2px dashed #2563eb',
+                      borderRadius: 2,
+                      px: 3,
+                      py: 1.5,
+                      transition: 'all 0.2s ease-in-out',
+                      '&:hover': {
+                        backgroundColor: 'rgba(37, 99, 235, 0.15)',
+                        transform: 'translateY(-2px)',
+                      },
+                    }}
+                  >
+                    <IconButton
+                      size="small"
+                      sx={{
+                        backgroundColor: 'primary.main',
+                        color: 'white',
+                        '&:hover': {
+                          backgroundColor: 'primary.dark',
+                        },
+                        boxShadow: 2,
+                      }}
+                      onClick={handleAddOneRow}
+                    >
+                      <AddIcon fontSize="small" />
+                    </IconButton>
+                    <Typography variant="body2" color="primary.main" fontWeight={500}>
+                      Add one Row
+                    </Typography>
+                  </Box>
+                </Fade>
+              </Box>
+
+
+              {/* Add Column Hover Area - Extended to the right of the table */}
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  right: -5,
+                  width: 30,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: 'transparent',
+                  zIndex: 10,
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={() => setShowAddColumnHover(true)}
+                onMouseLeave={() => setShowAddColumnHover(false)}
+              >
+                <Fade in={showAddColumnHover}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: 1,
+                      backgroundColor: 'rgba(100, 116, 139, 0.1)',
+                      border: '2px dashed #64748b',
+                      borderRadius: 2,
+                      px: 2,
+                      py: 3,
+                      transition: 'all 0.2s ease-in-out',
+                      width: 30,
+                      '&:hover': {
+                        backgroundColor: 'rgba(100, 116, 139, 0.15)',
+                        transform: 'translateX(-2px)',
+                      },
+                    }}
+                  >
+                    <IconButton
+                      size="small"
+                      sx={{
+                        backgroundColor: 'secondary.main',
+                        color: 'white',
+                        '&:hover': {
+                          backgroundColor: 'secondary.dark',
+                        },
+                        boxShadow: 2,
+                      }}
+                      onClick={() => setOpenColumnDialog(true)}
+                    >
+                      <ViewColumnIcon fontSize="small" />
+                    </IconButton>
+                    <Typography
+                      variant="caption"
+                      color="secondary.main"
+                      fontWeight={500}
+                      sx={{
+                        writingMode: 'vertical-rl',
+                        textOrientation: 'mixed',
+                      }}
+                    >
+                      Add Column
+                    </Typography>
+                  </Box>
+                </Fade>
+              </Box>
+            </Box>
+          </Paper>
+
+          {showAddRowDialog && (
+            <AddRowDialog  
+              open={showAddRowDialog} 
+              toggleOpen={handleAddRow2} />
+          )}
+
+
+          {/* Add dialog for adding new Column */}
+          <Dialog
+            open={openColumnDialog}
+            onClose={() => setOpenColumnDialog(false)}
+            maxWidth="sm"
+            fullWidth
+          >
+            <DialogTitle>Add New Column</DialogTitle>
+            <DialogContent>
+              <TextField
+                autoFocus
+                margin="dense"
+                label="Column Name"
+                fullWidth
+                variant="outlined"
+                value={newColumnName}
+                onChange={(e) => setNewColumnName(e.target.value)}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                select
+                margin="dense"
+                label="Column Type"
+                fullWidth
+                variant="outlined"
+                value={newColumnType}
+                onChange={(e) => setNewColumnType(e.target.value)}
+              >
+                {columnTypes.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.value}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpenColumnDialog(false)}>Cancel</Button>
+              <Button onClick={handleAddColumn} variant="contained">
+                Add Column
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Grid>
-        <Grid2 item justifyItems='center'>
-            <Tables3 col={columnTypeLabel} rowws={paginatedRows}/>
-        </Grid2>
       </Grid>
     </>
   );

@@ -365,7 +365,7 @@ const IndicatorSpecificationCard = () => {
             </Grid>
           )}
           {/* Adding the new step "Method" */}
-          {lockedStep.dataset.step === '4' && lockedStep.method.type !== ""  &&(
+          {lockedStep.dataset.step === '4' && lockedStep?.method.type !== ""  &&(
             <Grid size={{ xs: 12 }}>
               <Method />
             </Grid>
