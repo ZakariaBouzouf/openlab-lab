@@ -27,6 +27,8 @@ import { v4 as uuidv4 } from "uuid"
 import { DataTypes } from "../../../utils/data/config.js";
 import AddRowDialog from "../components/add-row-dialog.jsx";
 import Tables3 from "../tables3.jsx";
+import Tables from "../tables.jsx";
+import AddColumnDialog from "../components/add-column-dialog.jsx";
 
 
 const DataTableManager = () => {
@@ -47,8 +49,10 @@ const DataTableManager = () => {
     page: 1,
     pageSize: 5,
     gridHeight: 1650,
+    openAddColumn:false,
     //   typeSelected: Object.values(DataTypes)[0],
   });
+
   // const [state, setState] = useState({
   //   columnName: {
   //     value: "",
@@ -195,16 +199,6 @@ const DataTableManager = () => {
     setRowModesModel(newRowModesModel);
   };
 
-  // const handleAddColumn = (event) => {
-  //   let { value } = event.target;
-  //   setState((prevState) => ({
-  //     ...prevState,
-  //     columnName: {
-  //       ...prevState,
-  //       value: value,
-  //     },
-  //   }));
-  // };
 
 
   const handleAddRow = () => {
@@ -225,10 +219,6 @@ const DataTableManager = () => {
     });
     setShowAddRowHover(false);
   };
-  const handleAddRow2 = () => {
-    console.log("I was clicked")
-    setShowAddRowDialog((prevState) => !prevState)
-  }
 
   const paginatedRows = dataset.rows.slice(
     (state.page - 1) * state.pageSize,
@@ -256,38 +246,6 @@ const DataTableManager = () => {
     },
   ];
 
-  // const handleAddColumn = () => {
-  //   if (newColumnName.trim()) {
-  //     const newColumn = {
-  //       field: newColumnName.toLowerCase().replace(/\s+/g, '_'),
-  //       headerName: newColumnName,
-  //       width: 150,
-  //       editable: true,
-  //       type: newColumnType === 'string' ? undefined : newColumnType,
-  //       ...(newColumnType === 'singleSelect' && {
-  //         valueOptions: ['Option 1', 'Option 2', 'Option 3'],
-  //       }),
-  //     };
-  //
-  //     const actionsColumn = columns.find(col => col.field === 'actions');
-  //     const otherColumns = columns.filter(col => col.field !== 'actions');
-  //
-  //     setColumns([...otherColumns, newColumn, actionsColumn]);
-  //
-  //     // Add default values for the new column to existing rows
-  //     setRows(rows.map(row => ({
-  //       ...row,
-  //       [newColumn.field]: newColumnType === 'number' ? 0 :
-  //         newColumnType === 'boolean' ? false :
-  //           newColumnType === 'date' ? new Date() : '',
-  //     })));
-  //
-  //     setNewColumnName('');
-  //     setNewColumnType('string');
-  //     setOpenColumnDialog(false);
-  //     setShowAddColumnHover(false);
-  //   }
-  // };
   const handleAddColumn = () => {
     let fieldUUID = uuidv4();
     console.log("dv4", fieldUUID)
@@ -378,7 +336,12 @@ const DataTableManager = () => {
     };
   });
 
-
+  const handleOpenAddColumn = () => {
+    setState((prevState) => ({
+      ...prevState,
+      openAddColumn: !prevState.openAddColumn,
+    }));
+  };
 
   return (
     <>
@@ -389,7 +352,12 @@ const DataTableManager = () => {
         <Grid item xs={12}>
         </Grid>
         <Grid2 item justifyItems='center'>
-            <Tables3 col={columnTypeLabel} rowws={paginatedRows}/>
+          {/* <Tables3 col={columnTypeLabel} rowws={paginatedRows}/> */}
+          <Tables  initialColumns={columnTypeLabel} initialRows={paginatedRows} addColumn={handleOpenAddColumn} />
+          <AddColumnDialog
+            open={state.openAddColumn}
+            toggleOpen={handleOpenAddColumn}
+          />
         </Grid2>
       </Grid>
     </>
