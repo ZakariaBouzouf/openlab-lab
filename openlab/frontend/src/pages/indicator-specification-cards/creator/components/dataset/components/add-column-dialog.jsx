@@ -29,6 +29,7 @@ const AddColumnDialog = ({ open, toggleOpen }) => {
   });
 
   const handleAddColumn = (event) => {
+    console.log(event.target)
     let { value } = event.target;
     setState((prevState) => ({
       ...prevState,
@@ -112,6 +113,7 @@ const AddColumnDialog = ({ open, toggleOpen }) => {
       variant: "success",
     });
     toggleOpen();
+    console.log("Col" , newRows,newColumnData)
   };
 
   return (
@@ -202,7 +204,8 @@ const AddColumnDialog = ({ open, toggleOpen }) => {
             onClick={handleAddNewColumn}
             disabled={
               state.columnName.value === "" ||
-              !state.numberOfRows ||
+              //TODO: Investigate more about this
+              // !state.numberOfRows ||
               Object.entries(state.typeSelected).length === 0
             }
             autoFocus

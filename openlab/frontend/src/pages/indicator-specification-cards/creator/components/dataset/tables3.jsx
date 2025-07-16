@@ -10,11 +10,14 @@ import {
   TextField,
   IconButton,
   Box,
-  Typography
+  Typography,
+  styled,
+  Tooltip,
+  Chip
 } from '@mui/material';
 import { Add } from '@mui/icons-material';
 
-const Tables = ({col,rowws}) => {
+const Tables = ({ col, rowws }) => {
   const [columns, setColumns] = useState([
     { id: 'col1', name: 'Name', type: 'text' },
     { id: 'col2', name: 'Status', type: 'text' },
@@ -39,9 +42,9 @@ const Tables = ({col,rowws}) => {
       name: `Column ${columns.length + 1}`,
       type: 'text'
     };
-    
+
     setColumns([...columns, newColumn]);
-    
+
     // Add empty values for the new column in all existing rows
     setRows(rows.map(row => ({
       ...row,
@@ -52,43 +55,107 @@ const Tables = ({col,rowws}) => {
   const addRow = () => {
     const newRowId = `row${rows.length + 1}`;
     const newRow = { id: newRowId };
-    
+
     // Initialize all column values as empty strings
     columns.forEach(col => {
       newRow[col.id] = '';
     });
-    
+
     setRows([...rows, newRow]);
   };
 
   const updateCell = (rowId, columnId, value) => {
-    setRows(rows.map(row => 
+    setRows(rows.map(row =>
       row.id === rowId ? { ...row, [columnId]: value } : row
     ));
   };
 
   const updateColumnName = (columnId, newName) => {
-    setColumns(columns.map(col => 
+    setColumns(columns.map(col =>
       col.id === columnId ? { ...col, name: newName } : col
     ));
   };
 
-  const handleCellClick = (rowId, columnId) => {
-    setEditingCell(`${rowId}-${columnId}`);
+  const StyledTableHeaderCell = styled(TableCell)(({ theme }) => ({
+    border: `1px solid ${theme.palette.divider}`,
+    backgroundColor: theme.palette.grey[50],
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: theme.transitions.create(['background-color'], {
+      duration: theme.transitions.duration.shortest,
+    }),
+    '&:hover': {
+      backgroundColor: theme.palette.grey[100],
+    },
+  }));
+
+  const StyledTextField = styled(TextField)(({ theme }) => ({
+    '& .MuiInput-underline:before': {
+      borderBottom: 'none',
+    },
+    '& .MuiInput-underline:hover:before': {
+      borderBottom: 'none',
+    },
+    '& .MuiInput-underline:after': {
+      borderBottom: `2px solid ${theme.palette.primary.main}`,
+    },
+    '& .MuiInputBase-input': {
+      padding: '4px 0',
+    },
+  }));
+
+  const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    border: `1px solid ${theme.palette.divider}`,
+    cursor: 'pointer',
+    transition: theme.transitions.create(['background-color'], {
+      duration: theme.transitions.duration.shortest,
+    }),
+    '&:hover': {
+      backgroundColor: theme.palette.action.hover,
+    },
+  }));
+  const getDataTypeColor = (dataType) => {
+    switch (dataType?.type) {
+      case 'number':
+        return 'primary';
+      case 'string':
+        return 'secondary';
+      default:
+        return 'default';
+    }
+  };
+  console.log("Data-TAble | column", col)
+  console.log("Data-TAble | row", rowws)
+  const handleCellClick = (rowId, field) => {
+    const column = columns.find(col => col.field === field);
+    if (column && column.editable) {
+      setEditingCell(`${rowId}-${field}`);
+    }
   };
 
   const handleCellBlur = () => {
     setEditingCell(null);
   };
 
-  const handleColumnHeaderClick = (columnId) => {
-    setEditingCell(`header-${columnId}`);
+  const handleColumnHeaderClick = (field) => {
+    setEditingCell(`header-${field}`);
   };
+
+  const handleKeyDown = (e, rowId, field) => {
+    if (e.key === 'Enter') {
+      setEditingCell(null);
+    }
+  };
+
+  const getCellValue = (row, field) => {
+    return row[field] !== undefined ? row[field] : '';
+  };
+
 
   return (
     <Box sx={{ position: 'relative', p: 2 }}>
-      <Box 
-        sx={{ 
+      <Box
+        sx={{
           position: 'relative',
           display: 'inline-block',
           '&:hover .add-column-zone': {
@@ -99,9 +166,9 @@ const Tables = ({col,rowws}) => {
           }
         }}
       >
-        <TableContainer 
-          component={Paper} 
-          sx={{ 
+        <TableContainer
+          component={Paper}
+          sx={{
             maxWidth: 'fit-content',
             border: '1px solid #e0e0e0',
             borderRadius: 1
@@ -111,84 +178,75 @@ const Tables = ({col,rowws}) => {
             <TableHead>
               <TableRow>
                 {col.map((column) => (
-                  <TableCell
-                    key={column.id}
+                  <StyledTableHeaderCell
+                    key={column.field}
                     sx={{
-                      fontWeight: 'bold',
-                      backgroundColor: '#f5f5f5',
-                      border: '1px solid #e0e0e0',
-                      cursor: 'pointer',
-                      '&:hover': {
-                        backgroundColor: '#eeeeee'
-                      }
+                      width: column.width || 200,
+                      textAlign: column.headerAlign || 'left'
                     }}
-                    onClick={() => handleColumnHeaderClick(column.id)}
+                    onClick={() => handleColumnHeaderClick(column.field)}
                   >
-                    {editingCell === `header-${column.id}` ? (
-                      <TextField
-                        value={column.name}
-                        onChange={(e) => updateColumnName(column.id, e.target.value)}
+                    {editingCell === `header-${column.field}` ? (
+                      <StyledTextField
+                        value={column.headerName}
+                        onChange={(e) => updateColumnName(column.field, e.target.value)}
                         onBlur={handleCellBlur}
+                        onKeyDown={(e) => handleKeyDown(e, null, column.field)}
                         variant="standard"
                         size="small"
                         autoFocus
-                        sx={{
-                          '& .MuiInput-underline:before': { borderBottom: 'none' },
-                          '& .MuiInput-underline:hover:before': { borderBottom: 'none' },
-                          '& .MuiInput-underline:after': { borderBottom: '2px solid #1976d2' }
-                        }}
+                        fullWidth
                       />
                     ) : (
-                      column.name
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="subtitle2" fontWeight={600}>
+                          {column.headerName}
+                        </Typography>
+                        <Tooltip title={column.dataType?.description || ''}>
+                          <Chip
+                            label={column.dataType?.value || column.type}
+                            size="small"
+                            variant="outlined"
+                            color={getDataTypeColor(column.dataType)}
+                            sx={{ fontSize: '0.75rem', height: '20px' }}
+                          />
+                        </Tooltip>
+                      </Box>
                     )}
-                  </TableCell>
+                  </StyledTableHeaderCell>
                 ))}
               </TableRow>
             </TableHead>
             <TableBody>
               {rowws.map((row) => (
-                <TableRow
-                  key={row.id}
-                  sx={{
-                    '&:hover': {
-                      backgroundColor: '#f9f9f9'
-                    }
-                  }}
-                >
+                <TableRow key={row.id}>
                   {col.map((column) => (
-                    <TableCell
-                      key={`${row.id}-${column.id}`}
+                    <StyledTableCell
+                      key={`${row.id}-${column.field}`}
                       sx={{
-                        border: '1px solid #e0e0e0',
-                        padding: '8px 12px',
-                        cursor: 'pointer',
-                        '&:hover': {
-                          backgroundColor: '#f0f0f0'
-                        }
+                        width: column.width || 200,
+                        textAlign: column.align || 'left'
                       }}
-                      onClick={() => handleCellClick(row.id, column.id)}
+                      onClick={() => handleCellClick(row.id, column.field)}
                     >
-                      {editingCell === `${row.id}-${column.id}` ? (
-                        <TextField
-                          value={row[column.id] || ''}
-                          onChange={(e) => updateCell(row.id, column.id, e.target.value)}
+                      {editingCell === `${row.id}-${column.field}` ? (
+                        <StyledTextField
+                          type={column.type === 'number' ? 'number' : 'text'}
+                          value={getCellValue(row, column.field)}
+                          onChange={(e) => updateCell(row.id, column.field, e.target.value)}
                           onBlur={handleCellBlur}
+                          onKeyDown={(e) => handleKeyDown(e, row.id, column.field)}
                           variant="standard"
                           size="small"
                           autoFocus
-                          sx={{
-                            width: '100%',
-                            '& .MuiInput-underline:before': { borderBottom: 'none' },
-                            '& .MuiInput-underline:hover:before': { borderBottom: 'none' },
-                            '& .MuiInput-underline:after': { borderBottom: '2px solid #1976d2' }
-                          }}
+                          fullWidth
                         />
                       ) : (
                         <Typography variant="body2">
-                          {row[column.id] || ''}
+                          {getCellValue(row, column.field)}
                         </Typography>
                       )}
-                    </TableCell>
+                    </StyledTableCell>
                   ))}
                 </TableRow>
               ))}
