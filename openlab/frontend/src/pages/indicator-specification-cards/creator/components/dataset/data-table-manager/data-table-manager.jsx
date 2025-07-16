@@ -321,6 +321,12 @@ const DataTableManager = () => {
     });
   }
 
+  const dataTypeLabel = {
+      string: "Categorical",
+      number: "Numerical",
+      catOrdered: "Categorical (ordinal)",
+  };
+
   const columnTypeLabel = dataset.columns.map((col) => {
     const headerLabel = dataTypeLabel[col.type] || "No Column Type Selected";
     const isNumber = col.type === "number";

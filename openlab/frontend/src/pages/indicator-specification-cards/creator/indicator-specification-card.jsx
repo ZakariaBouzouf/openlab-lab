@@ -342,6 +342,8 @@ const IndicatorSpecificationCard = () => {
           setVisRef,
           dataset,
           setDataset,
+          chartIsValid,
+          setChartIsValid,
         }}
       >
         <Grid container spacing={2} alignItems="center">

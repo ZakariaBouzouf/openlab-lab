@@ -207,7 +207,7 @@ const Visualization = () => {
                 <Button
                   fullWidth
                   variant="contained"
-                  disabled={visRef.chart.type === "" || !chartIsValid}
+                  disabled={visRef.chart.type === ""}
                   onClick={
                     lockedStep.visualization.step === "3"
                       ? handleUnlockDataset

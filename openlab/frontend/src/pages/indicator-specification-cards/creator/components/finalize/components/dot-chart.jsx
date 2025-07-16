@@ -172,8 +172,8 @@ const DotChart = ({ customize = false, handleToggleCustomizePanel }) => {
 
   // * This effect is used to update the chart when the dataset column changes.
   useEffect(() => {
-    const stringColumns = dataset.columns.filter(
-      (col) => col.type === "string"
+    const xAxisCandidates = dataset.columns.filter(
+      (col) => col.type === "string" || col.type === "catOrdered"
     );
     const numberColumns = dataset.columns.filter(
       (col) => col.type === "number"
@@ -182,7 +182,7 @@ const DotChart = ({ customize = false, handleToggleCustomizePanel }) => {
       ...prevState,
       axisOptions: {
         ...prevState.axisOptions,
-        xAxisOptions: stringColumns,
+        xAxisOptions: xAxisCandidates,
         yAxisOptions: numberColumns,
       },
     }));
@@ -192,7 +192,7 @@ const DotChart = ({ customize = false, handleToggleCustomizePanel }) => {
         ...prevVisRef.data,
         axisOptions: {
           ...prevVisRef.data.axisOptions,
-          xAxisOptions: stringColumns,
+          xAxisOptions: xAxisCandidates ,
           yAxisOptions: numberColumns,
         },
       },
@@ -206,8 +206,11 @@ const DotChart = ({ customize = false, handleToggleCustomizePanel }) => {
       visRef.data.axisOptions.selectedXAxis || state.axisOptions.selectedXAxis;
     const selectedYAxis =
       visRef.data.axisOptions.selectedYAxis || state.axisOptions.selectedYAxis;
-    const stringColumns =
-      visRef.data.axisOptions.xAxisOptions || state.axisOptions.xAxisOptions;
+    const stringColumns = dataset.columns.filter(
+      (col) => col.type === "string" || col.type === "catOrdered"
+    );
+    // const stringColumns =
+    //   visRef.data.axisOptions.xAxisOptions || state.axisOptions.xAxisOptions;
     const numberColumns =
       visRef.data.axisOptions.yAxisOptions || state.axisOptions.yAxisOptions;
 
@@ -244,6 +247,7 @@ const DotChart = ({ customize = false, handleToggleCustomizePanel }) => {
   }, [
     visRef.data.axisOptions.xAxisOptions,
     visRef.data.axisOptions.yAxisOptions,
+    dataset.columns,
   ]);
 
   // * This effect is used to update the chart when the selected X-axis or Y-axis changes.
@@ -360,13 +364,28 @@ const DotChart = ({ customize = false, handleToggleCustomizePanel }) => {
   );
 
   // Determine the label to show based on the column type
+  const getAxisTypeLabel = (type) => {
+    if (type === "string") return "Categorical";
+    if (type === "catOrdered") return "Categorical (ordinal)";
+    if (type === "number") return "Numerical";
+    return "No Data";
+  };
+
   const xAxisColumnType = selectedXAxisColumn
-    ? (selectedXAxisColumn.type === "string" ? "Categorical" : "Numerical")
-    : "No Data"; // optional fallback if no column is selecte
+    ? getAxisTypeLabel(selectedXAxisColumn.type)
+    : "No Data";
 
   const yAxisColumnType = selectedYAxisColumn
-    ? (selectedYAxisColumn.type === "string" ? "Categorical" : "Numerical")
-    : "No Data"; // optional fallback if no column is selected
+    ? getAxisTypeLabel(selectedYAxisColumn.type)
+    : "No Data";
+
+  // const xAxisColumnType = selectedXAxisColumn
+  //   ? (selectedXAxisColumn.type === "string" ? "Categorical" : "Numerical")
+  //   : "No Data"; // optional fallback if no column is selecte
+
+  // const yAxisColumnType = selectedYAxisColumn
+  //   ? (selectedYAxisColumn.type === "string" ? "Categorical" : "Numerical")
+  //   : "No Data"; // optional fallback if no column is selected
 
   const xAxisLabel = `X-Axis (${xAxisColumnType})`;
   const yAxisLabel = `Y-Axis (${yAxisColumnType})`;

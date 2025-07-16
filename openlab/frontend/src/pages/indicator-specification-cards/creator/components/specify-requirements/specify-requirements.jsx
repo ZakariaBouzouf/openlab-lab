@@ -156,7 +156,8 @@ const SpecifyRequirements = () => {
         tempRows = tempRows.map((row, index) => ({
           ...row,
           [fieldUUID]:
-            item.type.type === "string" ? `${item.value} ${index + 1}` : 0,
+            item.type.type === "string" || item.type.type === "catOrdered"
+              ? `${item.value} ${index + 1}` : 0,
         }));
       } else {
         for (let i = 0; i < 3; i++) {

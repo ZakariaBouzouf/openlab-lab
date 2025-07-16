@@ -359,7 +359,7 @@ const RadarChart = ({ customize = false, handleToggleCustomizePanel }) => {
   // Determine the label to show based on the column type
   const xAxisColumnType = selectedXAxisColumn
     ? (selectedXAxisColumn.type === "string" ? "Categorical" : "Numerical")
-    : "No Data"; // optional fallback if no column is selecte
+    : "No Data";
 
   // If multiple data selected
   const selectedYAxesColumns = (state.axisOptions.selectedYAxis || []).map((field) => {
@@ -435,7 +435,7 @@ const RadarChart = ({ customize = false, handleToggleCustomizePanel }) => {
             <FormHelperText>Multi-select possible</FormHelperText>
           </FormControl>
           {/* Warning for Y-Axis */}
-          {yAxesColumnTypes === "No Data" && (
+          {selectedYAxesColumns.length === 0 && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
               Missing numerical data
             </Typography>
