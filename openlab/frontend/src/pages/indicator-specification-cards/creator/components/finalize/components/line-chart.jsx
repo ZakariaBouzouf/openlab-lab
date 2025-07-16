@@ -436,7 +436,7 @@ const LineChart = ({ customize = false, handleToggleCustomizePanel }) => {
             <FormHelperText>Multi-select possible</FormHelperText>
           </FormControl>
           {/* Warning for Y-Axis */}
-            {yAxesColumnTypes === "No Data" && (
+            {selectedYAxesColumns.length === 0 && (
               <Typography color="error" variant="body2" sx={{ mt: 1 }}>
                 Missing numerical data
               </Typography>
