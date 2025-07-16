@@ -34,8 +34,7 @@ import Home from "../../pages/home/home.jsx";
 import IndicatorSpecificationCard from "../../pages/indicator-specification-cards/creator/indicator-specification-card.jsx";
 import IscDashboard from "../../pages/indicator-specification-cards/dashboard/isc-dashboard.jsx";
 import IscPreview from "../../pages/indicator-specification-cards/dashboard/components/isc-preview.jsx";
-import Tables from "../../pages/indicator-specification-cards/creator/components/dataset/tables.jsx";
-import Tables2 from "../../pages/indicator-specification-cards/creator/components/dataset/tables2.jsx";
+import Tables3 from "../../pages/indicator-specification-cards/creator/components/dataset/tables3.jsx";
 
 const drawerWidth = 280;
 
@@ -116,7 +115,7 @@ const AppRoutes = () => {
                       path="/dashboard"
                       element={
                         <PrivateRoute
-                          component={<Tables2 />}
+                          component={<Tables3 />}
                           allowedRoles={[
                             RoleTypes.user,
                             RoleTypes.userWithoutLRS,
