@@ -8,13 +8,38 @@ import React, {
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 import { ISCContext } from "../../../indicator-specification-card.jsx";
 import { ClearAll as ClearAllIcon } from "@mui/icons-material";
-import Grid from "@mui/material/Grid2"
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Fade, Grid, Grid2, IconButton, MenuItem, Paper, Table, TableContainer, TextField, Typography } from "@mui/material";
 import Footer from "./components/footer.jsx";
 import NoRowsOverlay from "./components/no-rows-overlay.jsx";
 import ColumnMenu from "./column-menu/column-menu.jsx";
 import TableHeaderBar from "./components/table-header-bar.jsx";
+import { enqueueSnackbar } from "notistack";
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Save as SaveIcon,
+  Cancel as CancelIcon,
+  TableRows as TableRowsIcon,
+  ViewColumn as ViewColumnIcon,
+} from '@mui/icons-material';
+import { v4 as uuidv4 } from "uuid"
+import { DataTypes } from "../../../utils/data/config.js";
+import AddRowDialog from "../components/add-row-dialog.jsx";
+import Tables3 from "../tables3.jsx";
+import Tables from "../tables.jsx";
+import AddColumnDialog from "../components/add-column-dialog.jsx";
+
 
 const DataTableManager = () => {
+  const [rowModesModel, setRowModesModel] = useState({});
+  const [showAddRowHover, setShowAddRowHover] = useState(false);
+  const [showAddRowDialog, setShowAddRowDialog] = useState(false);
+  const [showAddColumnHover, setShowAddColumnHover] = useState(false);
+  const [openColumnDialog, setOpenColumnDialog] = useState(false);
+  const [newColumnName, setNewColumnName] = useState('');
+  const [newColumnType, setNewColumnType] = useState('string');
+
   const { dataset, setDataset } = useContext(ISCContext);
   const [state, setState] = useState({
     cellModesModel: {},
@@ -23,15 +48,27 @@ const DataTableManager = () => {
     anchorEl: null,
     page: 1,
     pageSize: 5,
-    gridHeight: 450,
+    gridHeight: 1650,
+    openAddColumn:false,
+    //   typeSelected: Object.values(DataTypes)[0],
   });
+
+  // const [state, setState] = useState({
+  //   columnName: {
+  //     value: "",
+  //     exists: false,
+  //   },
+  //   numberOfRows: dataset.rows.length,
+  // });
+
+  console.log(dataset)
 
   const style = {
     dataGrid: {
       "& .MuiDataGrid-columnHeaders": {
         cursor: "pointer",
         fontSize: "17px",
-        // textDecorationLine: "underline",
+        textDecorationLine: "underline",
       },
       "& .MuiDataGrid-cell:hover": {
         color: "primary.main",
@@ -64,7 +101,7 @@ const DataTableManager = () => {
       ...prevState,
       cellModesModel: newModel,
     }));
-  }, []);
+  }, [dataset]);
 
   const handleCellClick = useCallback((params) => {
     setState((prevState) => ({
@@ -142,6 +179,47 @@ const DataTableManager = () => {
     }));
   };
 
+  const handleRowEditStop = (params, event) => {
+    if (params.reason === GridRowEditStopReasons.rowFocusOut) {
+      event.defaultMuiPrevented = true;
+    }
+  };
+
+  const handleEditClick = (id) => () => {
+    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+  };
+
+  const processRowUpdate = (newRow) => {
+    const updatedRow = { ...newRow, isNew: false };
+    setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+    return updatedRow;
+  };
+
+  const handleRowModesModelChange = (newRowModesModel) => {
+    setRowModesModel(newRowModesModel);
+  };
+
+
+
+  const handleAddRow = () => {
+    const id = Math.max(...dataset.rows.map((row) => row.id), 0) + 1;
+    const newRow = {
+      id,
+      name: '',
+      email: '',
+      role: '',
+      department: '',
+      status: 'Active',
+      isNew: true,
+    };
+    setRows([...rows, newRow]);
+    setRowModesModel({
+      ...rowModesModel,
+      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
+    });
+    setShowAddRowHover(false);
+  };
+
   const paginatedRows = dataset.rows.slice(
     (state.page - 1) * state.pageSize,
     state.page * state.pageSize,
@@ -153,21 +231,124 @@ const DataTableManager = () => {
       catOrdered: "Categorical (ordinal)",
   };
 
+  const columnTypes = [
+    {
+      value: "Categorical",
+      type: "string",
+      description:
+        "Groups information into specific categories or labels without any order or ranking. For example, colors like red, blue, and green are categories.",
+    },
+    {
+      value: "Numerical",
+      type: "number",
+      description:
+        "Uses numbers to describe things like age, height, or income that can be counted or measured.",
+    },
+    {
+      value: "Categorical (ordinal)",
+      type: "string",
+      description:
+        "Groups information into categories that have a specific order. For example, temperature can be categorized as low, medium, or high.",
+    },
+  ];
+
+  const handleAddColumn = () => {
+    let fieldUUID = uuidv4();
+    console.log("dv4", fieldUUID)
+    const newColumnData = [
+      ...dataset.columns,
+      {
+        field: fieldUUID,
+        headerName: newColumnName,
+        sortable: false,
+        editable: true,
+        width: 200,
+        type: newColumnType
+      },
+    ];
+    let newRows = [];
+    if (Boolean(dataset.rows.length)) {
+      newRows = dataset.rows.map((row, index) => ({
+        ...row,
+        [fieldUUID]:
+          newColumnType === "string"
+            ? `${state.columnName.value} ${index + 1}`
+            : 0,
+      }));
+    } else {
+      for (let i = 0; i < state.numberOfRows; i++) {
+        newRows.push({
+          id: uuidv4(),
+          [fieldUUID]:
+            state.typeSelected.type === "string"
+              ? `${state.columnName.value} ${i + 1}`
+              : 0,
+        });
+      }
+    }
+
+    setState((prevState) => ({
+      ...prevState,
+      columnName: {
+        ...prevState.columnName,
+        value: "",
+        exists: false,
+      },
+      typeSelected: {},
+      numberOfRows: 0,
+    }));
+
+    setDataset((prevState) => ({
+      ...prevState,
+      rows: newRows,
+      columns: newColumnData,
+    }));
+
+    enqueueSnackbar("New column added successfully", {
+      variant: "success",
+    });
+    toggleOpen();
+  };
+
+  const handleAddOneRow = () => {
+    let tempColumnData = dataset.columns
+    const newRow = { id: uuidv4() }
+    tempColumnData.forEach((column) => {
+      newRow[column.field] = column.type === "number" ? 0 : "";
+    });
+
+    setDataset((prevState) => ({
+      ...prevState,
+      rows: [...prevState.rows, newRow]
+    }))
+
+    enqueueSnackbar("New row added successfully", {
+      variant: "success",
+    });
+  }
+
   const columnTypeLabel = dataset.columns.map((col) => {
     const headerLabel = dataTypeLabel[col.type] || "No Column Type Selected";
     const isNumber = col.type === "number";
     return {
       ...col,
-      ...(isNumber ? {align:"left", headerAlign: "left"} : {}),
+      ...(isNumber ? { align: "left", headerAlign: "left" } : {}),
       renderHeader: (params) => (
-        <div style={{display: "flex", flexDirection: "column", alignItems: "flex-start"}}>
-          <span style={{textDecorationLine: "underline"}}>{params.colDef.headerName}</span>
-          <small style={{fontSize: "0.7rem", color: "#999"}}>{headerLabel}</small>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+          <span style={{ textDecorationLine: "underline" }}>{params.colDef.headerName}</span>
+          <small style={{ fontSize: "0.7rem", color: "#999" }}>{headerLabel}</small>
         </div>
       ),
     };
   });
-  
+
+  const handleOpenAddColumn = () => {
+    setState((prevState) => ({
+      ...prevState,
+      openAddColumn: !prevState.openAddColumn,
+    }));
+  };
+
   return (
     <>
       <Grid spacing={2}>
@@ -175,42 +356,15 @@ const DataTableManager = () => {
           <TableHeaderBar />
         </Grid>
         <Grid item xs={12}>
-          <DataGrid
-            columns={columnTypeLabel}
-            rows={paginatedRows}
-            apiRef={apiRef}
-            columnMenuClearIcon={<ClearAllIcon />}
-            cellModesModel={state.cellModesModel}
-            checkboxSelection
-            disableRowSelectionOnClick={true}
-            disableColumnMenu={false}
-            onColumnHeaderClick={(params) => handleColumnHeaderClick(params)}
-            onCellModesModelChange={handleCellModesModelChange}
-            onCellClick={handleCellClick}
-            onRowSelectionModelChange={(newSelectionModel) =>
-              handleRowSelectionModelChange(newSelectionModel)
-            }
-            pageSizeOptions={[5, 10, 25]}
-            processRowUpdate={handleProcessRowUpdate}
-            rowHeight={40}
-            selectionModel={state.selectionModel}
-            showCellVerticalBorder
-            showFooterRowCount
-            showFooterSelectedRowCount
-            slots={{
-              noRowsOverlay: () => <NoRowsOverlay />,
-              columnMenu: (props) => <ColumnMenu props={props} />,
-              footer: () => <Footer state={state} setState={setState} />,
-            }}
-            sx={style.dataGrid}
-            componentsProps={{
-              row: {
-                onMouseEnter: handlePopperOpen,
-                onMouseLeave: handlePopperClose,
-              },
-            }}
-          />
         </Grid>
+        <Grid2 item justifyItems='center'>
+          {/* <Tables3 col={columnTypeLabel} rowws={paginatedRows}/> */}
+          <Tables  initialColumns={columnTypeLabel} initialRows={paginatedRows} addColumn={handleOpenAddColumn} />
+          <AddColumnDialog
+            open={state.openAddColumn}
+            toggleOpen={handleOpenAddColumn}
+          />
+        </Grid2>
       </Grid>
     </>
   );
