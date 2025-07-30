@@ -221,16 +221,16 @@ const Tables = ({ addColumn, columns, setColumns, rows, setRows }) => {
     return row[field] !== undefined ? row[field] : '';
   };
 
-  const getDataTypeColor = (dataType) => {
-    switch (dataType?.type) {
-      case 'number':
-        return 'primary';
-      case 'string':
-        return 'secondary';
-      default:
-        return 'default';
-    }
-  };
+  // const getDataTypeColor = (dataType) => {
+  //   switch (dataType?.type) {
+  //     case 'number':
+  //       return 'primary';
+  //     case 'string':
+  //       return 'secondary';
+  //     default:
+  //       return 'default';
+  //   }
+  // };
 
   return (
     <Box sx={{ p: 2, position: 'relative' }}>
@@ -282,7 +282,7 @@ const Tables = ({ addColumn, columns, setColumns, rows, setRows }) => {
                             label={column.dataType?.value || column.type}
                             size="small"
                             variant="outlined"
-                            color={getDataTypeColor(column.dataType)}
+                            color='default'
                             sx={{ fontSize: '0.75rem', height: '20px' }}
                           />
                         </Tooltip>

@@ -29,7 +29,6 @@ const AddColumnDialog = ({ open, toggleOpen ,setColumns}) => {
   });
 
   const handleAddColumn = (event) => {
-    console.log(event.target)
     let { value } = event.target;
     setState((prevState) => ({
       ...prevState,
@@ -63,6 +62,7 @@ const AddColumnDialog = ({ open, toggleOpen ,setColumns}) => {
     const newColumnData = [
       ...dataset.columns,
       {
+        dataType:state.typeSelected,
         field: fieldUUID,
         headerName: state.columnName.value,
         sortable: false,
@@ -114,7 +114,6 @@ const AddColumnDialog = ({ open, toggleOpen ,setColumns}) => {
       variant: "success",
     });
     toggleOpen();
-    console.log("Col" , newRows,newColumnData)
   };
 
   return (
