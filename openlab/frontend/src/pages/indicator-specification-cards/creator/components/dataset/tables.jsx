@@ -59,82 +59,12 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   },
 }));
 
-// Mock UUID generator
-// const generateUUID = () => {
-//   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-//     const r = Math.random() * 16 | 0;
-//     const v = c === 'x' ? r : (r & 0x3 | 0x8);
-//     return v.toString(16);
-//   });
-// };
 
-const Tables = ({ initialColumns = [], initialRows = [], onColumnsChange, onRowsChange,addColumn }) => {
+const Tables = ({ addColumn,columns, setColumns, rows, setRows }) => {
   // Default data if no props provided
   const { dataset, setDataset } = useContext(ISCContext)
-  const defaultColumns = [
-    {
-      "field": "9adf092a-feed-47a7-abd2-0d156e9e8e88",
-      "headerName": "subject",
-      "sortable": false,
-      "editable": true,
-      "width": 200,
-      "type": "string",
-      "dataType": {
-        "value": "Categorical",
-        "type": "string",
-        "description": "Groups information into specific categories or labels without any order or ranking."
-      }
-    },
-    {
-      "field": "27a0a60a-4207-434d-a678-f44f56109021",
-      "headerName": "grades",
-      "sortable": false,
-      "editable": true,
-      "width": 200,
-      "type": "number",
-      "dataType": {
-        "value": "Numerical",
-        "type": "number",
-        "description": "Uses numbers to describe things like age, height, or income that can be counted or measured."
-      },
-      "align": "left",
-      "headerAlign": "left"
-    }
-  ];
-
-  const defaultRows = [
-    {
-      "id": "8ebc1af9-8e6e-4c3b-ad80-ed83378843f2",
-      "9adf092a-feed-47a7-abd2-0d156e9e8e88": "subject 1",
-      "27a0a60a-4207-434d-a678-f44f56109021": 0
-    },
-    {
-      "id": "781d7dc4-fa0a-416d-87f8-98789da62ee0",
-      "9adf092a-feed-47a7-abd2-0d156e9e8e88": "subject 2",
-      "27a0a60a-4207-434d-a678-f44f56109021": 0
-    },
-    {
-      "id": "f0836f39-b256-4b94-977e-fcfe59983c53",
-      "9adf092a-feed-47a7-abd2-0d156e9e8e88": "subject 3",
-      "27a0a60a-4207-434d-a678-f44f56109021": 0
-    }
-  ];
-
-  const [columns, setColumns] = useState(initialColumns.length > 0 ? initialColumns : defaultColumns);
-  const [rows, setRows] = useState(initialRows.length > 0 ? initialRows : defaultRows);
   const [editingCell, setEditingCell] = useState(null);
 
-  // Update parent when columns or rows change
-  useEffect(() => {
-    if (onColumnsChange) {
-      onColumnsChange(columns);
-    }
-  }, [columns, onColumnsChange]);
-
-  // useEffect(() => {
-  //     onRowsChange(rows);
-  // }, [rows ]);
-  //
     const addRow = () => {
     let tempColumnData = dataset.columns;
     const newRow = { id: uuidv4() };
@@ -274,8 +204,6 @@ const Tables = ({ initialColumns = [], initialRows = [], onColumnsChange, onRows
     }
   };
 
-  console.log("Data-TAble | column", initialColumns)
-  console.log("Data-TAble | row", initialRows)
   return (
     <Box sx={{ p: 2, position: 'relative' }}>
       <Box

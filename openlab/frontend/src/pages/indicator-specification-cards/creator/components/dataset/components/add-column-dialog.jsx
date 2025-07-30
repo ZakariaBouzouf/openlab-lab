@@ -15,7 +15,7 @@ import { DataTypes } from "../../../utils/data/config.js";
 import { v4 as uuidv4 } from "uuid";
 import { useSnackbar } from "notistack";
 
-const AddColumnDialog = ({ open, toggleOpen }) => {
+const AddColumnDialog = ({ open, toggleOpen ,setColumns}) => {
   const { dataset, setDataset } = useContext(ISCContext);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -108,6 +108,7 @@ const AddColumnDialog = ({ open, toggleOpen }) => {
       rows: newRows,
       columns: newColumnData,
     }));
+    setColumns(newColumnData)
 
     enqueueSnackbar("New column added successfully", {
       variant: "success",
