@@ -34,7 +34,6 @@ import Home from "../../pages/home/home.jsx";
 import IndicatorSpecificationCard from "../../pages/indicator-specification-cards/creator/indicator-specification-card.jsx";
 import IscDashboard from "../../pages/indicator-specification-cards/dashboard/isc-dashboard.jsx";
 import IscPreview from "../../pages/indicator-specification-cards/dashboard/components/isc-preview.jsx";
-import Tables3 from "../../pages/indicator-specification-cards/creator/components/dataset/tables3.jsx";
 import { Dashboard } from "@mui/icons-material";
 
 const drawerWidth = 280;
