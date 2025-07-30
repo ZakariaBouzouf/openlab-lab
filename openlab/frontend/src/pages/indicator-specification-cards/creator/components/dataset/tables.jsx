@@ -12,13 +12,20 @@ import {
   Box,
   Typography,
   Chip,
-  Tooltip
+  Tooltip,
+  Button,
+  Menu,
+  MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import { Add, MoreVert, Edit, Delete } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { ISCContext } from '../../indicator-specification-card';
 import { v4 as uuidv4 } from "uuid"
 import { enqueueSnackbar } from 'notistack';
+import { ISCContext } from '../../indicator-specification-card';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   border: `1px solid ${theme.palette.divider}`,
@@ -60,16 +67,19 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 }));
 
 
-const Tables = ({ addColumn,columns, setColumns, rows, setRows }) => {
-  // Default data if no props provided
+const Tables = ({ addColumn, columns, setColumns, rows, setRows }) => {
   const { dataset, setDataset } = useContext(ISCContext)
   const [editingCell, setEditingCell] = useState(null);
+  const [headerMenuAnchor, setHeaderMenuAnchor] = useState(null);
+  const [selectedColumn, setSelectedColumn] = useState(null);
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
+  const [newColumnName, setNewColumnName] = useState('');
 
-    const addRow = () => {
+  const addRow = () => {
     let tempColumnData = dataset.columns;
     const newRow = { id: uuidv4() };
-      tempColumnData.forEach((column) => {
-        newRow[column.field] = column.type === "number" ? 0 : "";
+    tempColumnData.forEach((column) => {
+      newRow[column.field] = column.type === "number" ? 0 : "";
     });
 
     setDataset((prevState) => ({
@@ -85,52 +95,19 @@ const Tables = ({ addColumn,columns, setColumns, rows, setRows }) => {
     });
   };
 
-  const handleAddNewColumn2 = () => {
-    let fieldUUID = uuidv4();
-    const newColumnData = [
-      ...dataset.columns,
-      {
-        field: fieldUUID,
-        headerName: state.columnName.value,
-        sortable: false,
-        editable: true,
-        width: 200,
-        type: state.typeSelected.type,
-      },
-    ];
-    let newRows = [];
-    if (Boolean(dataset.rows.length)) {
-      newRows = dataset.rows.map((row, index) => ({
-        ...row,
-        [fieldUUID]:
-          state.typeSelected.type === "string"
-            ? `${state.columnName.value} ${index + 1}`
-            : 0,
-      }));
-    } else {
-      for (let i = 0; i < state.numberOfRows; i++) {
-        newRows.push({
-          id: uuidv4(),
-          [fieldUUID]:
-            state.typeSelected.type === "string"
-              ? `${state.columnName.value} ${i + 1}`
-              : 0,
-        });
-      }
-    }
-    setColumns(newColumnData)
+  const deleteRow = (rowId) => {
+    const newRows = rows.filter(row => row.id !== rowId)
+    setRows(newRows);
 
     setDataset((prevState) => ({
       ...prevState,
       rows: newRows,
-      columns: newColumnData,
     }));
 
-    enqueueSnackbar("New column added successfully", {
+    enqueueSnackbar("The row was removed successfully", {
       variant: "success",
     });
-    toggleOpen();
-    console.log("Col" , newRows,newColumnData)
+
   };
 
   const updateCell = (rowId, field, value) => {
@@ -139,7 +116,7 @@ const Tables = ({ addColumn,columns, setColumns, rows, setRows }) => {
 
     // Type conversion based on column type
     if (column && column.type === 'number') {
-      processedValue = value === '' ? 0 :  parseInt(value, 10)|| 0;
+      processedValue = value === '' ? 0 : parseInt(value, 10) || 0;
     }
 
     const updatedRows = rows.map(row =>
@@ -148,8 +125,8 @@ const Tables = ({ addColumn,columns, setColumns, rows, setRows }) => {
     setRows(updatedRows);
     setDataset(prev => ({
       ...prev,
-      rows: prev.rows.map(row  => 
-      row.id === rowId ? { ...row, [field]: value } : row
+      rows: prev.rows.map(row =>
+        row.id === rowId ? { ...row, [field]: value } : row
       )
     }));
 
@@ -168,6 +145,23 @@ const Tables = ({ addColumn,columns, setColumns, rows, setRows }) => {
 
   };
 
+  const deleteColumn = (field) => {
+    const updatedColumns = columns.filter(col => col.field !== field);
+    setColumns(updatedColumns);
+
+    // Also remove the column data from all rows
+    const updatedRows = rows.map(row => {
+      const { [field]: removed, ...rest } = row;
+      return rest;
+    });
+    setRows(updatedRows);
+
+    setDataset(prev => ({
+      ...prev,
+      columns: updatedColumns
+    }));
+  };
+
   const handleCellClick = (rowId, field) => {
     const column = columns.find(col => col.field === field);
     if (column && column.editable) {
@@ -175,12 +169,46 @@ const Tables = ({ addColumn,columns, setColumns, rows, setRows }) => {
     }
   };
 
-  const handleCellBlur = () => {
-    setEditingCell(null);
+  const handleColumnHeaderClick = (event, field) => {
+    event.stopPropagation();
+    setHeaderMenuAnchor(event.currentTarget);
+    setSelectedColumn(field);
   };
 
-  const handleColumnHeaderClick = (field) => {
-    setEditingCell(`header-${field}`);
+  const handleMenuClose = () => {
+    setHeaderMenuAnchor(null);
+    setSelectedColumn(null);
+  };
+
+  const handleRenameClick = () => {
+    const column = columns.find(col => col.field === selectedColumn);
+    setNewColumnName(column?.headerName || '');
+    setRenameDialogOpen(true);
+    handleMenuClose();
+  };
+
+  const handleDeleteClick = () => {
+    if (selectedColumn) {
+      deleteColumn(selectedColumn);
+    }
+    handleMenuClose();
+  };
+
+  const handleRenameSubmit = () => {
+    if (selectedColumn && newColumnName.trim()) {
+      updateColumnName(selectedColumn, newColumnName.trim());
+    }
+    setRenameDialogOpen(false);
+    setNewColumnName('');
+  };
+
+  const handleRenameCancel = () => {
+    setRenameDialogOpen(false);
+    setNewColumnName('');
+  };
+
+  const handleCellBlur = () => {
+    setEditingCell(null);
   };
 
   const handleKeyDown = (e, rowId, field) => {
@@ -229,27 +257,22 @@ const Tables = ({ addColumn,columns, setColumns, rows, setRows }) => {
           <Table sx={{ minWidth: 500 }}>
             <TableHead>
               <TableRow>
+                <StyledTableHeaderCell sx={{ width: 15, textAlign: 'center' }}>
+                </StyledTableHeaderCell>
                 {columns.map((column) => (
                   <StyledTableHeaderCell
                     key={column.field}
                     sx={{
                       width: column.width || 200,
-                      textAlign: column.headerAlign || 'left'
+                      textAlign: column.headerAlign || 'left',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                      }
                     }}
-                    onClick={() => handleColumnHeaderClick(column.field)}
+                    onClick={(e) => handleColumnHeaderClick(e, column.field)}
                   >
-                    {editingCell === `header-${column.field}` ? (
-                      <StyledTextField
-                        value={column.headerName}
-                        onChange={(e) => updateColumnName(column.field, e.target.value)}
-                        onBlur={handleCellBlur}
-                        onKeyDown={(e) => handleKeyDown(e, null, column.field)}
-                        variant="standard"
-                        size="small"
-                        autoFocus
-                        fullWidth
-                      />
-                    ) : (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'space-between' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Typography variant="subtitle2" fontWeight={600}>
                           {column.headerName}
@@ -264,14 +287,41 @@ const Tables = ({ addColumn,columns, setColumns, rows, setRows }) => {
                           />
                         </Tooltip>
                       </Box>
-                    )}
+                      <MoreVert fontSize="small" sx={{ opacity: 0.5 }} />
+                    </Box>
                   </StyledTableHeaderCell>
                 ))}
               </TableRow>
             </TableHead>
             <TableBody>
               {rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow
+                  key={row.id}
+                  sx={{
+                    '&:hover .delete-button': {
+                      opacity: 1
+                    }
+                  }}
+                >
+                  {/* Actions cell with delete button */}
+                  <StyledTableCell sx={{ width: 50, textAlign: 'center' }}>
+                    <IconButton
+                      className="delete-button"
+                      onClick={() => deleteRow(row.id)}
+                      sx={{
+                        opacity: 0,
+                        transition: 'opacity 0.2s ease',
+                        color: '#d32f2f',
+                        width: 24,
+                        height: 24,
+                        '&:hover': {
+                          backgroundColor: 'rgba(211, 47, 47, 0.08)'
+                        }
+                      }}
+                    >
+                      <Delete fontSize="small" />
+                    </IconButton>
+                  </StyledTableCell>
                   {columns.map((column) => (
                     <StyledTableCell
                       key={`${row.id}-${column.field}`}
@@ -306,78 +356,125 @@ const Tables = ({ addColumn,columns, setColumns, rows, setRows }) => {
           </Table>
         </TableContainer>
 
-      {/* Add Column Button */}
-      <Box
-        className="add-column-zone"
-        sx={{
-          position: 'absolute',
-          top: 0,
-          right: -40,
-          height: '100%',
-          width: 40,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          opacity: 0,
-          transition: 'opacity 0.2s ease',
-          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-          borderRadius: 1,
-          zIndex: 10
-        }}
-      >
-        <IconButton
-          onClick={addColumn}
+        {/* Add Column Button */}
+        <Box
+          className="add-column-zone"
           sx={{
-            backgroundColor: '#1976d2',
-            color: 'white',
-            width: 28,
-            height: 28,
-            '&:hover': {
-              backgroundColor: '#1565c0'
-            }
+            position: 'absolute',
+            top: 0,
+            right: -40,
+            height: '100%',
+            width: 40,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: 0,
+            transition: 'opacity 0.2s ease',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            borderRadius: 1,
+            zIndex: 10
           }}
         >
-          <Add fontSize="small" />
-        </IconButton>
+          <IconButton
+            onClick={addColumn}
+            sx={{
+              backgroundColor: '#1976d2',
+              color: 'white',
+              width: 28,
+              height: 28,
+              '&:hover': {
+                backgroundColor: '#1565c0'
+              }
+            }}
+          >
+            <Add fontSize="small" />
+          </IconButton>
+        </Box>
+
+        {/* Add Row Button */}
+        <Box
+          className="add-row-zone"
+          sx={{
+            position: 'absolute',
+            bottom: -40,
+            left: 0,
+            width: '100%',
+            height: 40,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: 0,
+            transition: 'opacity 0.2s ease',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            borderRadius: 1,
+            zIndex: 10
+          }}
+        >
+          <IconButton
+            onClick={addRow}
+            sx={{
+              backgroundColor: '#1976d2',
+              color: 'white',
+              width: 28,
+              height: 28,
+              '&:hover': {
+                backgroundColor: '#1565c0'
+              }
+            }}
+          >
+            <Add fontSize="small" />
+          </IconButton>
+        </Box>
       </Box>
 
-      {/* Add Row Button */}
-      <Box
-        className="add-row-zone"
-        sx={{
-          position: 'absolute',
-          bottom: -40,
-          left: 0,
-          width: '100%',
-          height: 40,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          opacity: 0,
-          transition: 'opacity 0.2s ease',
-          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-          borderRadius: 1,
-          zIndex: 10
+      {/* Header Context Menu */}
+      <Menu
+        anchorEl={headerMenuAnchor}
+        open={Boolean(headerMenuAnchor)}
+        onClose={handleMenuClose}
+        PaperProps={{
+          sx: {
+            minWidth: 150
+          }
         }}
       >
-        <IconButton
-          onClick={addRow}
-          sx={{
-            backgroundColor: '#1976d2',
-            color: 'white',
-            width: 28,
-            height: 28,
-            '&:hover': {
-              backgroundColor: '#1565c0'
-            }
-          }}
-        >
-          <Add fontSize="small" />
-        </IconButton>
-      </Box>
-      </Box>
-    </Box>
-  );
+        <MenuItem onClick={handleRenameClick}>
+          <Edit fontSize="small" sx={{ mr: 1 }} />
+          Rename Column
+        </MenuItem>
+        <MenuItem onClick={handleDeleteClick} sx={{ color: '#d32f2f' }}>
+          <Delete fontSize="small" sx={{ mr: 1 }} />
+          Delete Column
+        </MenuItem>
+      </Menu>
+
+      {/* Rename Dialog */}
+      <Dialog open={renameDialogOpen} onClose={handleRenameCancel}>
+        <DialogTitle>Rename Column</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Column Name"
+            fullWidth
+            variant="outlined"
+            value={newColumnName}
+            onChange={(e) => setNewColumnName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleRenameSubmit();
+              }
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleRenameCancel}>Cancel</Button>
+          <Button onClick={handleRenameSubmit} variant="contained">
+            Rename
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>);
 };
 
 export default Tables;

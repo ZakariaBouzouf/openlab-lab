@@ -24,13 +24,13 @@ const DataTableManager = () => {
     page: 1,
     pageSize: 5,
     gridHeight: 1650,
-    openAddColumn:false,
+    openAddColumn: false,
   });
 
-  useEffect(()=>{
+  useEffect(() => {
     setColumns(columnTypeLabel)
     setRows(paginatedRows)
-  },[])
+  }, [])
 
   useEffect(() => {
     const calculateGridHeight = () => {
@@ -54,9 +54,9 @@ const DataTableManager = () => {
   );
 
   const dataTypeLabel = {
-      string: "Categorical",
-      number: "Numerical",
-      catOrdered: "Categorical (ordinal)",
+    string: "Categorical",
+    number: "Numerical",
+    catOrdered: "Categorical (ordinal)",
   };
 
   const columnTypeLabel = dataset.columns.map((col) => {
