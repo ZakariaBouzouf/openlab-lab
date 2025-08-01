@@ -26,6 +26,7 @@ import { styled } from '@mui/material/styles';
 import { v4 as uuidv4 } from "uuid"
 import { enqueueSnackbar } from 'notistack';
 import { ISCContext } from '../../indicator-specification-card';
+import { DataTableContext } from './data-table-manager/data-table-manager';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   border: `1px solid ${theme.palette.divider}`,
@@ -67,8 +68,9 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 }));
 
 
-const Tables = ({ addColumn, columns, setColumns, rows, setRows }) => {
+const Tables = () => {
   const { dataset, setDataset } = useContext(ISCContext)
+  const {setRows,setColumns,rows,columns,handleOpenAddColumn: addColumn} = useContext(DataTableContext)
   const [editingCell, setEditingCell] = useState(null);
   const [headerMenuAnchor, setHeaderMenuAnchor] = useState(null);
   const [selectedColumn, setSelectedColumn] = useState(null);
@@ -221,17 +223,6 @@ const Tables = ({ addColumn, columns, setColumns, rows, setRows }) => {
     return row[field] !== undefined ? row[field] : '';
   };
 
-  // const getDataTypeColor = (dataType) => {
-  //   switch (dataType?.type) {
-  //     case 'number':
-  //       return 'primary';
-  //     case 'string':
-  //       return 'secondary';
-  //     default:
-  //       return 'default';
-  //   }
-  // };
-
   return (
     <Box sx={{ p: 2, position: 'relative' }}>
       <Box
@@ -304,10 +295,11 @@ const Tables = ({ addColumn, columns, setColumns, rows, setRows }) => {
                   }}
                 >
                   {/* Actions cell with delete button */}
-                  <StyledTableCell sx={{ width: 50, textAlign: 'center' }}>
+                  <StyledTableCell sx={{ width: 50, textAlign: 'center' }}
+                    onClick={() => deleteRow(row.id)}
+                  >
                     <IconButton
                       className="delete-button"
-                      onClick={() => deleteRow(row.id)}
                       sx={{
                         opacity: 0,
                         transition: 'opacity 0.2s ease',

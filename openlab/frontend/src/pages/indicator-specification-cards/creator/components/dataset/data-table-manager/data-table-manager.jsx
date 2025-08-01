@@ -1,4 +1,5 @@
 import React, {
+  createContext,
   useContext,
   useEffect,
   useState,
@@ -9,6 +10,7 @@ import TableHeaderBar from "./components/table-header-bar.jsx";
 import Tables from "../tables.jsx";
 import AddColumnDialog from "../components/add-column-dialog.jsx";
 
+export const DataTableContext = createContext(undefined)
 
 const DataTableManager = () => {
   const [columns, setColumns] = useState([]);
@@ -82,7 +84,15 @@ const DataTableManager = () => {
   };
 
   return (
-    <>
+    <DataTableContext.Provider
+      value={{
+        rows,
+        setRows,
+        columns,
+        setColumns,
+        handleOpenAddColumn,
+      }}
+    >
       <Grid spacing={2}>
         <Grid item xs={12}>
           <TableHeaderBar />
@@ -90,7 +100,7 @@ const DataTableManager = () => {
         <Grid item xs={12}>
         </Grid>
         <Grid2 item justifyItems='center'>
-          <Tables columns={columns} setColumns={setColumns} rows={rows} setRows={setRows} addColumn={handleOpenAddColumn} />
+          <Tables/>
           <AddColumnDialog
             setColumns={setColumns}
             open={state.openAddColumn}
@@ -98,7 +108,7 @@ const DataTableManager = () => {
           />
         </Grid2>
       </Grid>
-    </>
+    </DataTableContext.Provider>
   );
 };
 
