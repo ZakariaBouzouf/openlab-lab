@@ -11,8 +11,10 @@ import {
   TextField,
 } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
+import { DataTableContext } from "../data-table-manager/data-table-manager.jsx";
 
 const AddRowDialog = ({ open, toggleOpen }) => {
+  const {setRows} = useContext(DataTableContext)
   const { dataset, setDataset } = useContext(ISCContext);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -44,6 +46,9 @@ const AddRowDialog = ({ open, toggleOpen }) => {
       ...prevState,
       rows: [...prevState.rows, ...newRows],
     }));
+    setRows((prevState) => ([
+      ...prevState, ...newRows
+    ]))
     enqueueSnackbar("New row(s) added successfully", {
       variant: "success",
     });

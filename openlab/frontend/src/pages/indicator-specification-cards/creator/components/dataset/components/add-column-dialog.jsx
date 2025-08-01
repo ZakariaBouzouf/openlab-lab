@@ -14,8 +14,10 @@ import {
 import { DataTypes } from "../../../utils/data/config.js";
 import { v4 as uuidv4 } from "uuid";
 import { useSnackbar } from "notistack";
+import { DataTableContext } from "../data-table-manager/data-table-manager.jsx";
 
-const AddColumnDialog = ({ open, toggleOpen ,setColumns}) => {
+const AddColumnDialog = ({ open, toggleOpen }) => {
+  const {setColumns} = useContext(DataTableContext)
   const { dataset, setDataset } = useContext(ISCContext);
   const { enqueueSnackbar } = useSnackbar();
 

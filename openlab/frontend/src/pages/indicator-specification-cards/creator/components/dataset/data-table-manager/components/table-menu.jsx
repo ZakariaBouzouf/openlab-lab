@@ -9,8 +9,10 @@ import {
 import { Delete as DeleteIcon } from "@mui/icons-material";
 import DeleteDialog from "../../../../../../../common/components/delete-dialog/delete-dialog.jsx";
 import { ISCContext } from "../../../../indicator-specification-card.jsx";
+import { DataTableContext } from "../data-table-manager.jsx";
 
 const TableMenu = ({ state, setState }) => {
+  const {setRows,setColumns} = useContext(DataTableContext)
   const { setDataset, dataset } = useContext(ISCContext);
 
   const handleToggleMenu = () => {
@@ -39,6 +41,8 @@ const TableMenu = ({ state, setState }) => {
       deleteDialog: false, // Close pop-up window after deletion
       anchorEl: null,
     }));
+    setColumns([]);
+    setRows([]);
   };
 
   return (
