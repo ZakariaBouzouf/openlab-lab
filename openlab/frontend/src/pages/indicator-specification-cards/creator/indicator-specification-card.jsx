@@ -312,7 +312,7 @@ const IndicatorSpecificationCard = () => {
             ISC Creator
           </Typography>
         </div>
-        <Tooltip title="Reset ISC" placement="bottom">
+        <Tooltip title="Reset All" placement="bottom">
           <Button
             variant="outlined"
             color="error"

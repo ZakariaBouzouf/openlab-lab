@@ -589,48 +589,18 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
     }));
   }, []);
 
-  // Get selected column
-  const selectedXAxisColumn = state.axisOptions.xAxisOptions.find(
-    (col) => col.field === state.axisOptions.selectedXAxis
-  );
-
-  const selectedYAxisColumn = state.axisOptions.yAxisOptions.find(
-    (col) => col.field === state.axisOptions.selectedYAxis
-  );
-
-  const selectedStackColumn = state.axisOptions.barValueOptions.find(
-    (col) => col.field === state.axisOptions.selectedBarValue
-  );
-
-  // Determine the label to show based on the column type
-  const xAxisColumnType = selectedXAxisColumn
-    ? (selectedXAxisColumn.type === "string" ? "Categorical" : "Numerical")
-    : "No Data"; // optional fallback if no column is selecte
-
-  const yAxisColumnType = selectedYAxisColumn
-    ? (selectedYAxisColumn.type === "string" ? "Categorical" : "Numerical")
-    : "No Data"; // optional fallback if no column is selected
-
-  const stackColumnType = selectedStackColumn
-    ? (selectedStackColumn.type === "string" ? "Categorical" : "Numerical")
-    : "No Data"; // optional fallback if no column is selected
-
-  const xAxisLabel = `X-Axis: Group By (${xAxisColumnType})`;
-  const yAxisLabel = `Y-Axis (${yAxisColumnType})`;
-  const stackLabel = `Stack Label (${stackColumnType})`;
-
   return (
     <>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="x-axis-select-label">{xAxisLabel}</InputLabel>
+            <InputLabel id="x-axis-select-label">X-Axis: Group By (Categorical)</InputLabel>
             <Select
               labelId="x-axis-select-label"
               id="x-axis-select"
               value={state.axisOptions.selectedXAxis}
               onChange={handleXAxisChange}
-              label={xAxisLabel}
+              label="X-Axis: Group By (Categorical)"
               variant="outlined"
             >
               {state.axisOptions.xAxisOptions.map((col) => (
@@ -641,21 +611,29 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
             </Select>
           </FormControl>
           {/* Warning for X-Axis */}
-          {xAxisColumnType === "No Data" && (
+          {state.axisOptions.xAxisOptions.length === 0 && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              Missing categorical data
+              No categorical data found in your dataset.
+            </Typography>
+          )}
+          {/* Warning for X-Axis and Stack Label conflict */}
+          {state.axisOptions.selectedXAxis &&
+            state.axisOptions.selectedBarValue &&
+            state.axisOptions.selectedXAxis === state.axisOptions.selectedBarValue && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              X-Axis and Stack Label cannot be the same.
             </Typography>
           )}
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="bar-value-select-label">{stackLabel}</InputLabel>
+            <InputLabel id="bar-value-select-label">Stack Label (Categorical)</InputLabel>
             <Select
               labelId="bar-value-select-label"
               id="bar-value-select"
               value={state.axisOptions.selectedBarValue}
               onChange={handleBarValueChange}
-              label={stackLabel}
+              label="Stack Label (Categorical)"
               variant="outlined"
             >
               {state.axisOptions.barValueOptions.map((col) => (
@@ -665,22 +643,22 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
               ))}
             </Select>
           </FormControl>
-          {/* Warning for stackColumnType */}
-          {stackColumnType === "No Data" && (
+          {/* Warning for Stack Label */}
+          {state.axisOptions.barValueOptions.length === 0 && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              Missing categorical data
+              No categorical data found in your dataset.
             </Typography>
           )}
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="y-axis-select-label">{yAxisLabel}</InputLabel>
+            <InputLabel id="y-axis-select-label">Y-Axis (Numerical)</InputLabel>
             <Select
               labelId="y-axis-select-label"
               id="y-axis-select"
               value={state.axisOptions.selectedYAxis}
               onChange={handleYAxisChange}
-              label={yAxisLabel}
+              label="Y-Axis (Numerical)"
               variant="outlined"
             >
               {state.axisOptions.yAxisOptions.map((col) => (
@@ -691,9 +669,9 @@ const StackedBarChart = ({ customize = false, handleToggleCustomizePanel }) => {
             </Select>
           </FormControl>
           {/* Warning for Y-Axis */}
-          {yAxisColumnType === "No Data" && (
+          {state.axisOptions.yAxisOptions.length === 0 && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              Missing numerical data
+              No numerical data found in your dataset.
             </Typography>
           )}
         </Grid>

@@ -418,48 +418,18 @@ const ScatterPlotChart = ({
     }));
   };
 
-  // Get selected column
-  const selectedXAxisColumn = state.axisOptions.xAxisOptions.find(
-    (col) => col.field === state.axisOptions.selectedXAxis
-  );
-
-  const selectedYAxisColumn = state.axisOptions.yAxisOptions.find(
-    (col) => col.field === state.axisOptions.selectedYAxis
-  );
-
-  const selectedLabelColumn = state.axisOptions.labelOptions.find(
-    (col) => col.field === state.axisOptions.selectedLabel
-  );
-
-  // Determine the label to show based on the column type
-  const xAxisColumnType = selectedXAxisColumn
-    ? (selectedXAxisColumn.type === "string" ? "Categorical" : "Numerical")
-    : "No Data"; // optional fallback if no column is selecte
-
-  const yAxisColumnType = selectedYAxisColumn
-    ? (selectedYAxisColumn.type === "string" ? "Categorical" : "Numerical")
-    : "No Data"; // optional fallback if no column is selected
-
-  const labelColumnType = selectedLabelColumn
-    ? (selectedLabelColumn.type === "string" ? "Categorical" : "Numerical")
-    : "No Data"; // optional fallback if no column is selected
-
-  const xAxisLabel = `X-Axis (${xAxisColumnType})`;
-  const yAxisLabel = `Y-Axis (${yAxisColumnType})`;
-  const labels = `Labels (${labelColumnType})`;
-
   return (
     <>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="x-axis-select-label">{xAxisLabel}</InputLabel>
+            <InputLabel id="x-axis-select-label">X-Axis (Numerical)</InputLabel>
             <Select
               labelId="x-axis-select-label"
               id="x-axis-select"
               value={state.axisOptions.selectedXAxis}
               onChange={handleXAxisChange}
-              label={xAxisLabel}
+              label="X-Axis (Numerical)"
               variant="outlined"
             >
               {state.axisOptions.xAxisOptions.map((col) => (
@@ -470,21 +440,27 @@ const ScatterPlotChart = ({
             </Select>
           </FormControl>
           {/* Warning for X-Axis */}
-          {xAxisColumnType === "No Data" && (
+          {state.axisOptions.xAxisOptions.length === 0 && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              Missing numerical data
+              No numerical data found in your dataset.
+            </Typography>
+          )}
+          {/* Warning for X-Axis and Y-Axis conflict */}
+          {state.axisOptions.selectedXAxis === state.axisOptions.selectedYAxis && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              X-Axis and Y-Axis cannot be the same.
             </Typography>
           )}
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="y-axis-select-label">{yAxisLabel}</InputLabel>
+            <InputLabel id="y-axis-select-label">Y-Axis (Numerical)</InputLabel>
             <Select
               labelId="y-axis-select-label"
               id="y-axis-select"
               value={state.axisOptions.selectedYAxis}
               onChange={handleYAxisChange}
-              label={yAxisLabel}
+              label="Y-Axis (Numerical)"
               variant="outlined"
             >
               {state.axisOptions.yAxisOptions.map((col) => (
@@ -495,21 +471,21 @@ const ScatterPlotChart = ({
             </Select>
           </FormControl>
           {/* Warning for Y-Axis */}
-          {yAxisColumnType === "No Data" && (
+          {state.axisOptions.yAxisOptions.length === 0 && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              Missing numerical data
+              No numerical data found in your dataset.
             </Typography>
           )}
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="label-select-label">{labels}</InputLabel>
+            <InputLabel id="label-select-label">Labels (Categorical)</InputLabel>
             <Select
               labelId="label-select-label"
               id="label-select"
               value={state.axisOptions.selectedLabel}
               onChange={handleLabelChange}
-              label={labels}
+              label="Labels (Categorical)"
               variant="outlined"
             >
               {state.axisOptions.labelOptions.map((col) => (
@@ -520,9 +496,9 @@ const ScatterPlotChart = ({
             </Select>
           </FormControl>
           {/* Warning for Labels */}
-          {labelColumnType === "No Data" && (
+          {state.axisOptions.labelOptions.length === 0 && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              Missing categorical data
+              No categorical data found in your dataset.
             </Typography>
           )}
         </Grid>

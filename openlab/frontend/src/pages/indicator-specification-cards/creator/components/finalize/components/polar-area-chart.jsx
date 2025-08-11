@@ -331,39 +331,18 @@ const PolarAreaChart = ({ customize = false, handleToggleCustomizePanel }) => {
     }));
   };
 
-  // Get selected column
-  const selectedXAxisColumn = state.axisOptions.xAxisOptions.find(
-    (col) => col.field === state.axisOptions.selectedXAxis
-  );
-
-  const selectedYAxisColumn = state.axisOptions.yAxisOptions.find(
-    (col) => col.field === state.axisOptions.selectedYAxis
-  );
-
-  // Determine the label to show based on the column type
-  const xAxisColumnType = selectedXAxisColumn
-    ? (selectedXAxisColumn.type === "string" ? "Categorical" : "Numerical")
-    : "No Data";
-
-  const yAxisColumnType = selectedYAxisColumn
-    ? (selectedYAxisColumn.type === "string" ? "Categorical" : "Numerical")
-    : "No Data";
-
-  const xAxisLabel = `Categories (${xAxisColumnType})`;
-  const yAxisLabel = `Values (${yAxisColumnType})`;
-
   return (
     <>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth>
-            <InputLabel id="x-axis-select-label">{xAxisLabel}</InputLabel>
+            <InputLabel id="x-axis-select-label">Categories (Categorical)</InputLabel>
             <Select
               labelId="x-axis-select-label"
               id="x-axis-select"
               value={state.axisOptions.selectedXAxis}
               onChange={handleXAxisChange}
-              label={xAxisLabel}
+              label="Categories (Categorical)"
               variant="outlined"
             >
               {state.axisOptions.xAxisOptions.map((col) => (
@@ -374,21 +353,21 @@ const PolarAreaChart = ({ customize = false, handleToggleCustomizePanel }) => {
             </Select>
           </FormControl>
           {/* Warning for X-Axis */}
-          {xAxisColumnType === "No Data" && (
+          {state.axisOptions.xAxisOptions.length === 0 && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              Missing categorical data
+              Categories requires categorical data, but none was found in your dataset.
             </Typography>
           )}
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth>
-            <InputLabel id="y-axis-select-label">{yAxisLabel}</InputLabel>
+            <InputLabel id="y-axis-select-label">Values (Numerical)</InputLabel>
             <Select
               labelId="y-axis-select-label"
               id="y-axis-select"
               value={state.axisOptions.selectedYAxis}
               onChange={handleYAxisChange}
-              label={yAxisLabel}
+              label="Values (Numerical)"
               variant="outlined"
             >
               {state.axisOptions.yAxisOptions.map((col) => (
@@ -399,9 +378,9 @@ const PolarAreaChart = ({ customize = false, handleToggleCustomizePanel }) => {
             </Select>
           </FormControl>
           {/* Warning for Y-Axis */}
-          {yAxisColumnType === "No Data" && (
+          {state.axisOptions.yAxisOptions.length === 0 && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              Missing numerical data
+              Values requires numerical data, but none was found in your dataset.
             </Typography>
           )}
         </Grid>
