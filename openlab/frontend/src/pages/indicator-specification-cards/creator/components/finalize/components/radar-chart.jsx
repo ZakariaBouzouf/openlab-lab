@@ -351,43 +351,18 @@ const RadarChart = ({ customize = false, handleToggleCustomizePanel }) => {
     }));
   };
 
-  // Get selected column
-  const selectedXAxisColumn = state.axisOptions.xAxisOptions.find(
-    (col) => col.field === state.axisOptions.selectedXAxis
-  );
-
-  // Determine the label to show based on the column type
-  const xAxisColumnType = selectedXAxisColumn
-    ? (selectedXAxisColumn.type === "string" ? "Categorical" : "Numerical")
-    : "No Data";
-
-  // If multiple data selected
-  const selectedYAxesColumns = (state.axisOptions.selectedYAxis || []).map((field) => {
-  const col = state.axisOptions.yAxisOptions.find((c) => c.field === field);
-    return col
-    ? col.type === "string"
-      ? "Categorical"
-      : "Numerical"
-    : "No Data";
-  });
-
-  const yAxesColumnTypes = [...new Set(selectedYAxesColumns)].join(", "); // remove duplicates
-
-  const xAxisLabel = `X-Axis (${xAxisColumnType})`;
-  const yAxisLabel = `Y-Axes (${yAxesColumnTypes})`;
-
   return (
     <>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth>
-            <InputLabel id="x-axis-select-label">{xAxisLabel}</InputLabel>
+            <InputLabel id="x-axis-select-label">X-Axis (Categorical)</InputLabel>
             <Select
               labelId="x-axis-select-label"
               id="x-axis-select"
               value={state.axisOptions.selectedXAxis}
               onChange={handleXAxisChange}
-              label={xAxisLabel}
+              label="X-Axis (Categorical)"
               variant="outlined"
             >
               {state.axisOptions.xAxisOptions.map((col) => (
@@ -398,22 +373,22 @@ const RadarChart = ({ customize = false, handleToggleCustomizePanel }) => {
             </Select>
           </FormControl>
           {/* Warning for X-Axis */}
-            {xAxisColumnType === "No Data" && (
+            {state.axisOptions.xAxisOptions.length === 0 && (
               <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-                Missing categorical data
+                X-Axis requires categorical data, but none was found in your dataset.
               </Typography>
           )}
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth>
-            <InputLabel id="y-axis-select-label">{yAxisLabel}</InputLabel>
+            <InputLabel id="y-axis-select-label">Y-Axes (Numerical)</InputLabel>
             <Select
               labelId="y-axis-select-label"
               id="y-axis-select"
               multiple
               value={state.axisOptions.selectedYAxis}
               onChange={handleYAxisChange}
-              label={yAxisLabel}
+              label="Y-Axes (Numerical)"
               variant="outlined"
               renderValue={(selected) =>
                 selected
@@ -435,9 +410,9 @@ const RadarChart = ({ customize = false, handleToggleCustomizePanel }) => {
             <FormHelperText>Multi-select possible</FormHelperText>
           </FormControl>
           {/* Warning for Y-Axis */}
-          {selectedYAxesColumns.length === 0 && (
+          {state.axisOptions.yAxisOptions.length === 0 && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              Missing numerical data
+              Y-Axes require numerical data, but none was found in your dataset.
             </Typography>
           )}
         </Grid>

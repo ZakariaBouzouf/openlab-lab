@@ -172,8 +172,8 @@ const DotChart = ({ customize = false, handleToggleCustomizePanel }) => {
 
   // * This effect is used to update the chart when the dataset column changes.
   useEffect(() => {
-    const xAxisCandidates = dataset.columns.filter(
-      (col) => col.type === "string" || col.type === "catOrdered"
+    const catOrderedColumns = dataset.columns.filter(
+      (col) => col.type === "catOrdered"
     );
     const numberColumns = dataset.columns.filter(
       (col) => col.type === "number"
@@ -182,7 +182,7 @@ const DotChart = ({ customize = false, handleToggleCustomizePanel }) => {
       ...prevState,
       axisOptions: {
         ...prevState.axisOptions,
-        xAxisOptions: xAxisCandidates,
+        xAxisOptions: catOrderedColumns,
         yAxisOptions: numberColumns,
       },
     }));
@@ -192,7 +192,7 @@ const DotChart = ({ customize = false, handleToggleCustomizePanel }) => {
         ...prevVisRef.data,
         axisOptions: {
           ...prevVisRef.data.axisOptions,
-          xAxisOptions: xAxisCandidates ,
+          xAxisOptions: catOrderedColumns,
           yAxisOptions: numberColumns,
         },
       },
@@ -206,11 +206,8 @@ const DotChart = ({ customize = false, handleToggleCustomizePanel }) => {
       visRef.data.axisOptions.selectedXAxis || state.axisOptions.selectedXAxis;
     const selectedYAxis =
       visRef.data.axisOptions.selectedYAxis || state.axisOptions.selectedYAxis;
-    const stringColumns = dataset.columns.filter(
-      (col) => col.type === "string" || col.type === "catOrdered"
-    );
-    // const stringColumns =
-    //   visRef.data.axisOptions.xAxisOptions || state.axisOptions.xAxisOptions;
+    const catOrderedColumns =
+      visRef.data.axisOptions.xAxisOptions || state.axisOptions.xAxisOptions;
     const numberColumns =
       visRef.data.axisOptions.yAxisOptions || state.axisOptions.yAxisOptions;
 
@@ -219,11 +216,11 @@ const DotChart = ({ customize = false, handleToggleCustomizePanel }) => {
       updatedSelectedXAxis = selectedXAxis;
     else if (selectedXAxis.length !== 0)
       updatedSelectedXAxis =
-        stringColumns.find((col) => col.field === selectedXAxis)?.field ||
-        (stringColumns.length > 0 ? stringColumns[0].field : "");
+        catOrderedColumns.find((col) => col.field === selectedXAxis)?.field ||
+        (catOrderedColumns.length > 0 ? catOrderedColumns[0].field : "");
     else
       updatedSelectedXAxis =
-        stringColumns.length > 0 ? stringColumns[0].field : "";
+        catOrderedColumns.length > 0 ? catOrderedColumns[0].field : "";
 
     let updatedSelectedYAxis = "";
     if (visRef.edit && selectedYAxis.length !== 0)
@@ -354,54 +351,18 @@ const DotChart = ({ customize = false, handleToggleCustomizePanel }) => {
     }));
   };
 
-  // Get selected column
-  const selectedXAxisColumn = state.axisOptions.xAxisOptions.find(
-    (col) => col.field === state.axisOptions.selectedXAxis
-  );
-
-  const selectedYAxisColumn = state.axisOptions.yAxisOptions.find(
-    (col) => col.field === state.axisOptions.selectedYAxis
-  );
-
-  // Determine the label to show based on the column type
-  const getAxisTypeLabel = (type) => {
-    if (type === "string") return "Categorical";
-    if (type === "catOrdered") return "Categorical (ordinal)";
-    if (type === "number") return "Numerical";
-    return "No Data";
-  };
-
-  const xAxisColumnType = selectedXAxisColumn
-    ? getAxisTypeLabel(selectedXAxisColumn.type)
-    : "No Data";
-
-  const yAxisColumnType = selectedYAxisColumn
-    ? getAxisTypeLabel(selectedYAxisColumn.type)
-    : "No Data";
-
-  // const xAxisColumnType = selectedXAxisColumn
-  //   ? (selectedXAxisColumn.type === "string" ? "Categorical" : "Numerical")
-  //   : "No Data"; // optional fallback if no column is selecte
-
-  // const yAxisColumnType = selectedYAxisColumn
-  //   ? (selectedYAxisColumn.type === "string" ? "Categorical" : "Numerical")
-  //   : "No Data"; // optional fallback if no column is selected
-
-  const xAxisLabel = `X-Axis (${xAxisColumnType})`;
-  const yAxisLabel = `Y-Axis (${yAxisColumnType})`;
-
   return (
     <>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth>
-            <InputLabel id="x-axis-select-label">{xAxisLabel}</InputLabel>
+            <InputLabel id="x-axis-select-label">X-Axis (Ordinal)</InputLabel>
             <Select
               labelId="x-axis-select-label"
               id="x-axis-select"
               value={state.axisOptions.selectedXAxis}
               onChange={handleXAxisChange}
-              label={xAxisLabel}
+              label="X-Axis (Ordinal)"
               variant="outlined"
             >
               {state.axisOptions.xAxisOptions.map((col) => (
@@ -412,21 +373,21 @@ const DotChart = ({ customize = false, handleToggleCustomizePanel }) => {
             </Select>
           </FormControl>
           {/* Warning for X-Axis */}
-          {xAxisColumnType === "No Data" && (
+          {state.axisOptions.xAxisOptions.length === 0 && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              Missing categorical data
+              X-Axis requires ordinal data, but none was found in your dataset.
             </Typography>
           )}
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth>
-            <InputLabel id="y-axis-select-label">{yAxisLabel}</InputLabel>
+            <InputLabel id="y-axis-select-label">Y-Axis (Numerical)</InputLabel>
             <Select
               labelId="y-axis-select-label"
               id="y-axis-select"
               value={state.axisOptions.selectedYAxis}
               onChange={handleYAxisChange}
-              label={yAxisLabel}
+              label="Y-Axis (Numerical)"
               variant="outlined"
             >
               {state.axisOptions.yAxisOptions.map((col) => (
@@ -437,9 +398,9 @@ const DotChart = ({ customize = false, handleToggleCustomizePanel }) => {
             </Select>
           </FormControl>
           {/* Warning for Y-Axis */}
-          {yAxisColumnType === "No Data" && (
+          {state.axisOptions.yAxisOptions.length === 0 && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              Missing numerical data
+              Y-Axis requires numerical data, but none was found in your dataset.
             </Typography>
           )}
         </Grid>
