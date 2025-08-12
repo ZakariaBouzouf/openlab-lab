@@ -446,7 +446,9 @@ const ScatterPlotChart = ({
             </Typography>
           )}
           {/* Warning for X-Axis and Y-Axis conflict */}
-          {state.axisOptions.selectedXAxis === state.axisOptions.selectedYAxis && (
+          {state.axisOptions.selectedXAxis &&
+            state.axisOptions.selectedYAxis &&
+            state.axisOptions.selectedXAxis === state.axisOptions.selectedYAxis && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
               X-Axis and Y-Axis cannot be the same.
             </Typography>

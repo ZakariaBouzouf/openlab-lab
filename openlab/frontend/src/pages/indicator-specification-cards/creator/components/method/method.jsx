@@ -22,7 +22,7 @@ import ImportDialog from "../dataset/components/import-dialog.jsx";
 import DataTable from "../dataset/components/data-table.jsx"
 
 const Method = () =>{
-  const { requirements, lockedStep, setLockedStep,dataset ,setDataset} =
+  const { requirements, lockedStep, setLockedStep, dataset, setDataset } =
     useContext(ISCContext);
   const [state, setState] = useState({
     showSelections: true,
@@ -83,6 +83,7 @@ const Method = () =>{
         ...prevState.finalize,
         locked: false,
         openPanel: true,
+        step: "6",
       },
     }));
   };
@@ -94,7 +95,7 @@ const Method = () =>{
         disabled={lockedStep.method.locked}
       >
         <AccordionSummary>
-          <Grid container spacing={1}>
+          <Grid container spacing={1} direction={"column"}>
             <Grid item xs={12}>
               <Grid
                 container

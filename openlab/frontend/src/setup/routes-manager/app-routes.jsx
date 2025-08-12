@@ -115,7 +115,7 @@ const AppRoutes = () => {
                       path="/dashboard"
                       element={
                         <PrivateRoute
-                          component={<Dashboard />}
+                          component={<Home />}
                           allowedRoles={[
                             RoleTypes.user,
                             RoleTypes.userWithoutLRS,

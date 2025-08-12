@@ -25,6 +25,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import DoneIcon from "@mui/icons-material/Done";
 import Dialog from '@mui/material/Dialog';
+import DialogTitle from "@mui/material/DialogTitle";
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
@@ -51,7 +52,6 @@ const SpecifyRequirements = () => {
       setPermissionToChange(false);
     }
   },[permissionToChange])
-  const navigate = useNavigate(); // <--- Zurück zur Dashboard-Navigation
 
   // pop up prompt after user stops typing for a while
   React.useEffect(() => {
@@ -671,13 +671,18 @@ const SpecifyRequirements = () => {
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
           >
+            <DialogTitle id="alert-dialog-title">
+              Confirm Changes
+            </DialogTitle>
             <DialogContent>
-              <DialogContentText id="alert-dialog-description">Do you want to update the changes in the following steps</DialogContentText>
+              <DialogContentText id="alert-dialog-description">
+                Do you want to apply these changes to the following steps?
+              </DialogContentText>
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleDeclineChange}>Disagree</Button>
-              <Button onClick={handleConfirmChange} autoFocus>
-                Agree
+              <Button onClick={handleDeclineChange}>Cancel</Button>
+              <Button onClick={handleConfirmChange} color="primary" variant="contained" autoFocus>
+                Confirm
               </Button>
             </DialogActions>
           </Dialog>
