@@ -27,7 +27,6 @@ const Visualization = () => {
     lockedStep,
     setLockedStep,
     visRef,
-    chartIsValid,
   } = useContext(ISCContext);
   const [state, setState] = useState({
     showSelections: true,
@@ -71,6 +70,7 @@ const Visualization = () => {
         ...prevState.finalize,
         locked: false,
         openPanel: true,
+        step: "6",
       },
     }));
   };

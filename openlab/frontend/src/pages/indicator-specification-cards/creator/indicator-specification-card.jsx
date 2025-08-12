@@ -12,8 +12,8 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import HomeIcon from "@mui/icons-material/Home";
+import ReplayIcon from "@mui/icons-material/Replay";
 import { useNavigate } from "react-router-dom";
 
 export const ISCContext = createContext(undefined);
@@ -143,11 +143,11 @@ const IndicatorSpecificationCard = () => {
             step:"0"
           },
           manual:{
-            locked:true,
+            locked: true,
             openPanel: false,
           },
           upload:{
-            locked:true,
+            locked: true,
             openPanel: false,
           },
         };
@@ -254,10 +254,10 @@ const IndicatorSpecificationCard = () => {
       visualization: { locked: true, openPanel: false, step: "0" },
       method: { locked: true, type: "", openPanel: false, step: "0" },
       dataset: { locked: true, openPanel: false, step: "0" },
-      finalize: { locked: true, openPanel: false, step: "5" },
+      finalize: { locked: true, openPanel: false, step: "6" },
     });
     sessionStorage.removeItem("session_isc");
-    enqueueSnackbar("All was reset.", { variant: "success" });
+    enqueueSnackbar("All inputs have been cleared.", { variant: "success" });
   };
 
   // Neue Handler für Dialog
@@ -272,13 +272,18 @@ const IndicatorSpecificationCard = () => {
     <>
       {/* Bestätigungsdialog */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>Are you sure you want to RESET?</DialogTitle>
+        <DialogTitle>Clear All Inputs</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to clear all inputs? This action cannot be undone.
+          </Typography>
+        </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">
-            No
+          <Button onClick={handleCloseDialog}>
+            Cancel
           </Button>
-          <Button onClick={handleConfirmDelete} color="error" variant="contained">
-            Yes
+          <Button onClick={handleConfirmDelete} color="primary" variant="contained">
+            Clear
           </Button>
         </DialogActions>
       </Dialog>
@@ -294,16 +299,17 @@ const IndicatorSpecificationCard = () => {
           justifyContent: "space-between",
           alignItems: "center",
           width: "100%",
-          padding: "12px 24px 12px 24px",
+          padding: "12px 24px",
           borderBottom: "1px solid #eee",
         }}
       >
         <div style={{ display: "flex", alignItems: "center" }}>
-          <Tooltip title="ISC Dashboard" placement="bottom">
+          <Tooltip title="Go to Dashboard" placement="bottom">
             <IconButton
               color="primary"
               onClick={() => navigate("/isc")}
-              sx={{ p: 0.5, mr: 1 }}
+              sx={{ p: 1, mr: 1, width: 40, height: 40 }}
+              aria-label="Go to Dashboard"
             >
               <HomeIcon />
             </IconButton>
@@ -312,22 +318,20 @@ const IndicatorSpecificationCard = () => {
             ISC Creator
           </Typography>
         </div>
-        <Tooltip title="Reset All" placement="bottom">
-          <Button
-            variant="outlined"
+        <Tooltip title="Clear All Inputs" placement="bottom">
+          <IconButton
             color="error"
             onClick={handleOpenDialog}
             sx={{
-              ml: 2,
-              minWidth: 0,
+              p: 1,
+              width: 40,
+              height: 40,
               borderRadius: "50%",
-              padding: "10px",
-              width: "40px",
-              height: "40px",
             }}
+            aria-label="Clear All Inputs"
           >
-            <DeleteForeverIcon />
-          </Button>
+            <ReplayIcon />
+          </IconButton>
         </Tooltip>
       </div>
 
@@ -369,7 +373,7 @@ const IndicatorSpecificationCard = () => {
             </Grid>
           )}
           {/* Adding the new step "Method" */}
-          {lockedStep.dataset.step === '4' && lockedStep?.method.type !== ""  &&(
+          {lockedStep.dataset.step === "4" && lockedStep?.method.type !== ""  && (
             <Grid size={{ xs: 12 }}>
               <Method />
             </Grid>
@@ -380,7 +384,7 @@ const IndicatorSpecificationCard = () => {
               <Dataset />
             </Grid>
           )}
-          {lockedStep.dataset.step === '3' && lockedStep.method.type !== ""  &&(
+          {lockedStep.dataset.step === "3" && lockedStep?.method.type !== ""  && (
             <Grid size={{ xs: 12 }}>
               <Method />
             </Grid>

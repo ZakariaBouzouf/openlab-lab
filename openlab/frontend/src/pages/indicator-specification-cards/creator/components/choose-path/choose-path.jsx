@@ -26,12 +26,28 @@ const ChoosePath = () => {
     showSelections: true,
   });
 
+  const resetChosenPath = (path, currentMethod) => ({
+    visualization: {
+      locked: path !== "Visualization",
+      openPanel: path === "Visualization",
+      step: path === "Visualization" ? "3" : "0",
+    },
+    dataset: {
+      locked: path !== "Dataset",
+      openPanel: path === "Dataset",
+      step: path === "Dataset" ? "3" : "0",
+    },
+    method: currentMethod,
+    finalize: { locked: true, openPanel: false, step: "0" },
+  });
+
   const handleChooseVisualizationPath = () => {
     let vis = "Visualization";
     handleTogglePanel();
     if (requirements.selectedPath !== vis) {
       setLockedStep((prevState) => ({
         ...prevState,
+        ...resetChosenPath(vis, prevState.method),
         visualization: {
           ...prevState.visualization,
           locked: false,
@@ -41,7 +57,7 @@ const ChoosePath = () => {
         dataset: {
           ...prevState.dataset,
           locked: true,
-          openedPanel: false,
+          openPanel: false,
           step: "4",
         },
       }));
@@ -54,7 +70,7 @@ const ChoosePath = () => {
         ...prevState,
         visualization: {
           ...prevState.visualization,
-          openedPanel: true,
+          openPanel: true,
         },
       }));
     }
@@ -67,6 +83,7 @@ const ChoosePath = () => {
       {
         setLockedStep((prevState) => ({
           ...prevState,
+          ...resetChosenPath(data, prevState.method),
           dataset: {
             ...prevState.dataset,
             locked: false,
@@ -77,7 +94,7 @@ const ChoosePath = () => {
             ...prevState.visualization,
             locked: true,
             openPanel: false,
-            step: "4",
+            step: "5",
           },
         }));
         setRequirements((prevState) => ({
@@ -90,7 +107,7 @@ const ChoosePath = () => {
         ...prevState,
         dataset: {
           ...prevState.dataset,
-          openedPanel: true,
+          openPanel: true,
         },
       }));
     }
