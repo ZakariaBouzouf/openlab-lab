@@ -40,7 +40,7 @@ When the user inputs data themselves, whether it is adding or deleting rows, the
 - Sweety Kheni
 
 ## Demo Video
-**To-do:** Make a screencast of project live demo (with or without voiceover), e.g. Youtube
+[OpenLAP ISC Creator Improvements by IDEA Explorer](https://www.youtube.com/watch?v=YQ7Ig9eEGd8)
 
 ## Key Features
 - Real-time data type feedback in dataset table and X & Y axis selectors
