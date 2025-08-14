@@ -5,7 +5,6 @@ By building on the existing ISC Creator, we created a more interactive and user-
 
 ## OpenLAP Application Web Architecture
 Our solution builds on the existing OpenLAP architecture and focuses primarily on the **frontend (React.js)** layer. Enhancements were developed within the ISC Creator module.
-- **To-do:** Add illustration here
 
 ### Technologies & Libraries Used
 - **Frontend**: React.js
@@ -17,20 +16,49 @@ Our solution builds on the existing OpenLAP architecture and focuses primarily o
 
 ## Screenshots
 
-![DataInput](openlab/frontend/image/imagepart1.png)
-This is the part, user can define the request.
+<table>
+  <tr>
+    <td align="center">
+      <img src="openlab/frontend/image/newGoalButton.png" width="500"><br>
+      <sub>Setting a new goal</sub>
+    </td>
+    <td align="center">
+      <img src="openlab/frontend/image/newConfirmationButton.png" width="500"><br>
+      <sub>Confirmation Button</sub>
+    </td>
+  </tr>
+</table>
 
-![ChartSelectionAndDescription](openlab/frontend/image/imagepart2.png)
-When user chooses a chart, he/she can see the description of the chart.
+<table>
+  <tr>
+    <td align="center">
+      <img src="openlab/frontend/image/newMethodPath.png" width="500"><br>
+      <sub>Two Dataset Method</sub>
+    </td>
+    <td align="center">
+      <img src="openlab/frontend/image/imagepart4.png" width="500"><br>
+      <sub>New Table</sub>
+    </td>
+  </tr>
+</table>
 
-![FileUpload](openlab/frontend/image/imagepart3.png)
-User can choose different ways to apply his/her data.
+<table>
+  <tr>
+    <td align="center">
+      <img src="openlab/frontend/image/uploadingFIle.png" width="500"><br>
+      <sub>Uploading a FIle that is not CSV</sub>
+    </td>
+    <td align="center">
+      <img src="openlab/frontend/image/warning.png" width="500"><br>
+      <sub>Missing data type warning</sub>
+    </td>
+  </tr>
+</table>
 
-![Method](openlab/frontend/image/imagepart4.png)
 
-When the user inputs data themselves, whether it is adding or deleting rows, the latest data will be synchronized to other related functions.
 
 ## Team Members
+> <img src="openlab/frontend/image/logoWhiteBackground.png" align="right" width=150/>
 - Bianca Magistrado
 - Jannik Funke genannt Kaiser
 - Feifan Zhai
