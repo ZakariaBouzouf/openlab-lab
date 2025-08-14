@@ -373,48 +373,18 @@ const TreeMap = ({ customize = false, handleToggleCustomizePanel }) => {
     }));
   };
 
-  // Get selected column
-  const selectedCategoryColumn = state.axisOptions.categoryOptions.find(
-    (col) => col.field === state.axisOptions.selectedCategory
-  );
-
-  const selectedXValueColumn = state.axisOptions.xValueOptions.find(
-    (col) => col.field === state.axisOptions.selectedXValue
-  );
-
-  const selectedValueColumn = state.axisOptions.valueOptions.find(
-    (col) => col.field === state.axisOptions.selectedValue
-  );
-
-  // Determine the label to show based on the column type
-  const categoryColumnType = selectedCategoryColumn
-    ? (selectedCategoryColumn.type === "string" ? "Categorical" : "Numerical")
-    : "No Data"; // optional fallback if no column is selecte
-
-  const xValueColumnType = selectedXValueColumn
-    ? (selectedXValueColumn.type === "string" ? "Categorical" : "Numerical")
-    : "No Data"; // optional fallback if no column is selected
-
-  const valueColumnType = selectedValueColumn
-    ? (selectedValueColumn.type === "string" ? "Categorical" : "Numerical")
-    : "No Data"; // optional fallback if no column is selected
-
-  const categoryLabel = `Category (${categoryColumnType})`;
-  const xValueLabel = `X-Value (${xValueColumnType})`;
-  const valueLabel = `Value (${valueColumnType})`;
-
   return (
     <>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="category-select-label">{categoryLabel}</InputLabel>
+            <InputLabel id="category-select-label">Category (Categorical)</InputLabel>
             <Select
               labelId="category-select-label"
               id="category-select"
               value={state.axisOptions.selectedCategory}
               onChange={handleCategoryChange}
-              label={categoryLabel}
+              label="Category (Categorical)"
               variant="outlined"
             >
               {state.axisOptions.categoryOptions.map((col) => (
@@ -425,21 +395,29 @@ const TreeMap = ({ customize = false, handleToggleCustomizePanel }) => {
             </Select>
           </FormControl>
           {/* Warning for Category */}
-          {categoryColumnType === "No Data" && (
+          {state.axisOptions.categoryOptions.length === 0 && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              Missing categorical data
+              No categorical data found in your dataset.
+            </Typography>
+          )}
+          {/* Warning for Category and X-Value conflict*/}
+          {state.axisOptions.selectedCategory &&
+            state.axisOptions.selectedXValue &&
+            state.axisOptions.selectedCategory === state.axisOptions.selectedXValue && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              Category and X-Value cannot be the same.
             </Typography>
           )}
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="x-value-select-label">{xValueLabel}</InputLabel>
+            <InputLabel id="x-value-select-label">X-Value (Categorical)</InputLabel>
             <Select
               labelId="x-value-select-label"
               id="x-value-select"
               value={state.axisOptions.selectedXValue}
               onChange={handleXValueChange}
-              label={xValueLabel}
+              label="X-Value (Categorical)"
               variant="outlined"
             >
               {state.axisOptions.xValueOptions.map((col) => (
@@ -450,21 +428,21 @@ const TreeMap = ({ customize = false, handleToggleCustomizePanel }) => {
             </Select>
           </FormControl>
           {/* Warning for X-Value */}
-          {xValueColumnType === "No Data" && (
+          {state.axisOptions.xValueOptions.length === 0 && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              Missing categorical data
+              No categorical data found in your dataset.
             </Typography>
           )}
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <FormControl fullWidth>
-            <InputLabel id="value-select-label">{valueLabel}</InputLabel>
+            <InputLabel id="value-select-label">Value (Numerical)</InputLabel>
             <Select
               labelId="value-select-label"
               id="value-select"
               value={state.axisOptions.selectedValue}
               onChange={handleValueChange}
-              label={valueLabel}
+              label="Value (Numerical)"
               variant="outlined"
             >
               {state.axisOptions.valueOptions.map((col) => (
@@ -475,9 +453,9 @@ const TreeMap = ({ customize = false, handleToggleCustomizePanel }) => {
             </Select>
           </FormControl>
           {/* Warning for Value */}
-          {valueColumnType === "No Data" && (
+          {state.axisOptions.valueOptions.length === 0 && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              Missing numerical data
+              No numerical data found in your dataset.
             </Typography>
           )}
         </Grid>

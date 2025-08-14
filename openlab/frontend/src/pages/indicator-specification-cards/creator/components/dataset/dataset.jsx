@@ -20,7 +20,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 
 const Dataset = () => {
-  const { requirements, setRequirements, lockedStep, setLockedStep,dataset } =
+  const { requirements, setRequirements, lockedStep, setLockedStep, dataset } =
     useContext(ISCContext);
   const [state, setState] = useState({
     showSelections: true,
@@ -40,14 +40,14 @@ const Dataset = () => {
         upload: {
           ...prevState.upload,
           locked: true,
-          openedPanel: false,
+          openPanel: false,
         },
         method:{
           ...prevState.method,
           type: vis,
-          locked:false,
+          locked: false,
           openPanel: true,
-          step:prevState?.dataset.step =="3"?"4":"5",
+          step: requirements.selectedPath === "Visualization" ? "5" : "4",
         }
       }));
       setRequirements((prevState) => ({
@@ -59,7 +59,7 @@ const Dataset = () => {
         ...prevState,
         manual: {
           ...prevState.manual,
-          openedPanel: true,
+          openPanel: true,
         },
       }));
     }
@@ -79,14 +79,14 @@ const Dataset = () => {
         upload: {
           ...prevState.upload,
           locked: false,
-          openedPanel: true,
+          openPanel: true,
         },
           method:{
           ...prevState.method,
           type: vis,
           locked:false,
           openPanel: true,
-          step:"5",
+          step: requirements.selectedPath === "Visualization" ? "5" : "4",
         }
       }));
       setRequirements((prevState) => ({
@@ -98,7 +98,7 @@ const Dataset = () => {
         ...prevState,
         upload: {
           ...prevState.upload,
-          openedPanel: true,
+          openPanel: true,
         },
       }));
     }
@@ -147,7 +147,7 @@ const Dataset = () => {
         disabled={lockedStep.dataset.locked}
       >
         <AccordionSummary>
-          <Grid container spacing={1}>
+          <Grid container spacing={1} direction={"column"}>
             <Grid item xs={12}>
               <Grid
                 container
@@ -233,8 +233,7 @@ const Dataset = () => {
             </Grow>
           </Grid>
         </AccordionSummary>
-
-        {(<AccordionDetails>
+        <AccordionDetails>
           <Grid container justifyContent="center" spacing={4} sx={{ py: 2 }}>
             <Grid item>
               <Paper
@@ -243,7 +242,7 @@ const Dataset = () => {
                 onClick={handleChooseManualPath}
               >
                 <Typography variant="h6" align="center">
-                  Create you own data set 
+                  Create Your Own Dataset 
                 </Typography>
               </Paper>
             </Grid>
@@ -260,8 +259,7 @@ const Dataset = () => {
               </Paper>
             </Grid>
           </Grid>
-        </AccordionDetails>)}
-
+        </AccordionDetails>
       </Accordion>
     </>
   );

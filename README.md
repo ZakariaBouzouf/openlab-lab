@@ -16,6 +16,7 @@ Our solution builds on the existing OpenLAP architecture and focuses primarily o
 - **Version Control**: Git & GitHub
 
 ## Screenshots
+
 ![DataInput](openlab/frontend/image/imagepart1.png)
 This is the part, user can define the request.
 
@@ -26,6 +27,7 @@ When user chooses a chart, he/she can see the description of the chart.
 User can choose different ways to apply his/her data.
 
 ![Method](openlab/frontend/image/imagepart4.png)
+
 When the user inputs data themselves, whether it is adding or deleting rows, the latest data will be synchronized to other related functions.
 
 ## Team Members

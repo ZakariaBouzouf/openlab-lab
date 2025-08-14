@@ -187,8 +187,8 @@ const LineChart = ({ customize = false, handleToggleCustomizePanel }) => {
   }, [darkMode]);
 
   useEffect(() => {
-    const stringColumns = dataset.columns.filter(
-      (col) => col.type === "string"
+    const catOrderedColumns = dataset.columns.filter(
+      (col) => col.type === "catOrdered"
     );
     const numberColumns = dataset.columns.filter(
       (col) => col.type === "number"
@@ -197,7 +197,7 @@ const LineChart = ({ customize = false, handleToggleCustomizePanel }) => {
       ...prevState,
       axisOptions: {
         ...prevState.axisOptions,
-        xAxisOptions: stringColumns,
+        xAxisOptions: catOrderedColumns,
         yAxisOptions: numberColumns,
       },
     }));
@@ -207,7 +207,7 @@ const LineChart = ({ customize = false, handleToggleCustomizePanel }) => {
         ...prevVisRef.data,
         axisOptions: {
           ...prevVisRef.data.axisOptions,
-          xAxisOptions: stringColumns,
+          xAxisOptions: catOrderedColumns,
           yAxisOptions: numberColumns,
         },
       },
@@ -220,7 +220,7 @@ const LineChart = ({ customize = false, handleToggleCustomizePanel }) => {
       visRef.data.axisOptions.selectedXAxis || state.axisOptions.selectedXAxis;
     const selectedYAxis =
       visRef.data.axisOptions.selectedYAxis || state.axisOptions.selectedYAxis;
-    const stringColumns =
+    const catOrderedColumns =
       visRef.data.axisOptions.xAxisOptions || state.axisOptions.xAxisOptions;
     const numberColumns =
       visRef.data.axisOptions.yAxisOptions || state.axisOptions.yAxisOptions;
@@ -230,11 +230,11 @@ const LineChart = ({ customize = false, handleToggleCustomizePanel }) => {
       updatedSelectedXAxis = selectedXAxis;
     else if (selectedXAxis.length !== 0)
       updatedSelectedXAxis =
-        stringColumns.find((col) => col.field === selectedXAxis)?.field ||
-        (stringColumns.length > 0 ? stringColumns[0].field : "");
+        catOrderedColumns.find((col) => col.field === selectedXAxis)?.field ||
+        (catOrderedColumns.length > 0 ? catOrderedColumns[0].field : "");
     else
       updatedSelectedXAxis =
-        stringColumns.length > 0 ? stringColumns[0].field : "";
+        catOrderedColumns.length > 0 ? catOrderedColumns[0].field : "";
 
     let updatedSelectedYAxis = [];
     if (visRef.edit && selectedYAxis.length !== 0)
@@ -352,43 +352,18 @@ const LineChart = ({ customize = false, handleToggleCustomizePanel }) => {
     localStorage.removeItem("series");
   };
 
-  // Get selected column
-  const selectedXAxisColumn = state.axisOptions.xAxisOptions.find(
-    (col) => col.field === state.axisOptions.selectedXAxis
-  );
-
-  // Determine the label to show based on the column type
-  const xAxisColumnType = selectedXAxisColumn
-    ? (selectedXAxisColumn.type === "string" ? "Categorical" : "Numerical")
-    : "No Data"; // optional fallback if no column is selected
-
-  // If multiple data selected
-  const selectedYAxesColumns = (state.axisOptions.selectedYAxis || []).map((field) => {
-  const col = state.axisOptions.yAxisOptions.find((c) => c.field === field);
-    return col
-    ? col.type === "string"
-        ? "Categorical"
-        : "Numerical"
-      : "No Data"
-  });
-
-  const yAxesColumnTypes = [...new Set(selectedYAxesColumns)].join(", "); // remove duplicates
-
-  const xAxisLabel = `X-Axis (${xAxisColumnType})`;
-  const yAxesLabel = `Y-Axes (${yAxesColumnTypes})`;
-
   return (
     <>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth>
-            <InputLabel id="x-axis-select-label">{xAxisLabel}</InputLabel>
+            <InputLabel id="x-axis-select-label">X-Axis (Ordinal)</InputLabel>
             <Select
               labelId="x-axis-select-label"
               id="x-axis-select"
               value={state.axisOptions.selectedXAxis}
               onChange={handleXAxisChange}
-              label={xAxisLabel}
+              label="X-Axis (Ordinal)"
               variant="outlined"
             >
               {state.axisOptions.xAxisOptions.map((col) => (
@@ -399,22 +374,22 @@ const LineChart = ({ customize = false, handleToggleCustomizePanel }) => {
             </Select>
           </FormControl>
           {/* Warning for X-Axis */}
-            {xAxisColumnType === "No Data" && (
+            {state.axisOptions.xAxisOptions.length === 0 && (
               <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-                Missing categorical data
+                X-Axis requires ordinal data, but none was found in your dataset.
               </Typography>
             )}
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth>
-            <InputLabel id="y-axes-select-label">{yAxesLabel}</InputLabel>
+            <InputLabel id="y-axes-select-label">Y-Axes (Numerical)</InputLabel>
             <Select
               labelId="y-axes-select-label"
               id="y-axes-select"
               multiple
               value={state.axisOptions.selectedYAxis}
               onChange={handleYAxesChange}
-              label={yAxesLabel}
+              label="Y-Axis (Numerical)"
               variant="outlined"
               renderValue={(selected) =>
                 selected
@@ -436,9 +411,9 @@ const LineChart = ({ customize = false, handleToggleCustomizePanel }) => {
             <FormHelperText>Multi-select possible</FormHelperText>
           </FormControl>
           {/* Warning for Y-Axis */}
-            {selectedYAxesColumns.length === 0 && (
+            {state.axisOptions.yAxisOptions.length === 0 && (
               <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-                Missing numerical data
+                Y-Axes require numerical data, but none was found in your dataset.
               </Typography>
           )}
         </Grid>
