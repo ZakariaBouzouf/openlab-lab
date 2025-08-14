@@ -20,7 +20,7 @@ Our solution builds on the existing OpenLAP architecture and focuses primarily o
   <tr>
     <td align="center">
       <img src="openlab/frontend/image/newGoalButton.png" width="500"><br>
-      <sub>Setting a new goal</sub>
+      <sub>Setting a New Goal</sub>
     </td>
     <td align="center">
       <img src="openlab/frontend/image/newConfirmationButton.png" width="500"><br>
@@ -36,7 +36,7 @@ Our solution builds on the existing OpenLAP architecture and focuses primarily o
       <sub>Two Dataset Method</sub>
     </td>
     <td align="center">
-      <img src="openlab/frontend/image/imagepart4.png" width="500"><br>
+      <img src="openlab/frontend/image/newTable.png" width="500"><br>
       <sub>New Table</sub>
     </td>
   </tr>
@@ -49,13 +49,24 @@ Our solution builds on the existing OpenLAP architecture and focuses primarily o
       <sub>Uploading a FIle that is not CSV</sub>
     </td>
     <td align="center">
-      <img src="openlab/frontend/image/warning.png" width="500"><br>
-      <sub>Missing data type warning</sub>
+      <img src="openlab/frontend/image/visibleChartDescription.png" width="500"><br>
+      <sub>Always Visible Chart Descripton</sub>
     </td>
   </tr>
 </table>
 
-
+<table>
+  <tr>
+    <td align="center">
+      <img src="openlab/frontend/image/warning.png" width="500"><br>
+      <sub>Missing Data Warning on Chart Selection</sub>
+    </td>
+    <td align="center">
+      <img src="openlab/frontend/image/xAxisWarning.png" width="500"><br>
+      <sub>Missing Data Warning on on X/Y Axis</sub>
+    </td>
+  </tr>
+</table>
 
 ## Team Members
 > <img src="openlab/frontend/image/logoWhiteBackground.png" align="right" width=150/>
@@ -74,12 +85,11 @@ Our solution builds on the existing OpenLAP architecture and focuses primarily o
 [Advertisement Video](https://mega.nz/file/KAkyWRiQ#u5hXM_gU02gIa-y7nvpeARn7uYPx1sfQDspGpT6wtVk)
 
 ## Key Features
-- Real-time data type feedback in dataset table and X & Y axis selectors
-- Warnings displayed when required data is missing in chart selection
-- Fixed table menu icon alignment for better UI consistency
-- Improved CSV file detection and resolved web app crash issues
 - Synchronization of changes across different steps for smooth workflow
 - Refactored dataset step for better code structure and usability
+- Improved CSV file detection and resolved web app crash issues
+- Real-time data type feedback in dataset table and X & Y axis selectors
+- Warnings displayed when required data is missing in chart selection
 
 ## Potential Future Improvements
 - User profile integration with dataset
